@@ -1,0 +1,29 @@
+src/
+├── app/                      # Next.js App Router
+│   ├── (auth)/               # Group cho xác thực (Login, Register, Forgot Password)
+│   │   ├── login/page.tsx
+│   │   └── register/page.tsx
+│   ├── (candidate)/          # Giao diện cho Ứng viên (FR-C)
+│   │   ├── dashboard/        # Trang chủ ứng viên
+│   │   ├── profile/          # Hồ sơ chuẩn hóa (FR-C-02)
+│   │   ├── jobs/             # Tìm kiếm & chi tiết công việc (FR-C-04, 05)
+│   │   └── applications/     # Theo dõi trạng thái ứng tuyển (FR-C-08)
+│   ├── (recruiter)/          # Giao diện cho Nhà tuyển dụng (FR-R)
+│   │   ├── jobs/             # Quản lý tin tuyển dụng (FR-R-03)
+│   │   ├── applicants/       # Hệ thống ATS & AI Matching (FR-R-05, 07)
+│   │   └── schedule/         # Lên lịch phỏng vấn (FR-R-06)
+│   ├── (admin)/              # Giao diện quản trị hệ thống (FR-A)
+│   │   ├── companies/        # Duyệt hồ sơ doanh nghiệp (FR-A-01)
+│   │   └── ai-monitor/       # Giám sát AI & Token (FR-A-05)
+│   ├── api/                  # Route handlers nếu bạn làm BFF (Backend for Frontend)
+│   └── layout.tsx            # Root layout toàn hệ thống
+├── components/               # Các component dùng chung
+│   ├── ui/                   # Button, Input, Modal (dùng thư viện Shadcn/UI)
+│   ├── shared/               # Navbar, Sidebar, Footer theo từng Role
+│   └── ai/                   # AI Chatbot widget, Matching Score display
+├── hooks/                    # Custom hooks (ví dụ: useAuth, useJobSearch)
+├── lib/                      # Các cấu hình thư viện (axios, utils, next-auth)
+├── services/                 # Gọi API đến Backend (AuthService, JobService, AIService)
+├── store/                    # Quản lý state toàn cục (Zustand hoặc Redux)
+├── types/                    # Khai báo TypeScript (Dựa trên 23 bảng DB) [cite: 151]
+└── assets/                   # Hình ảnh, icons, font

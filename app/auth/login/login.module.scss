@@ -1,0 +1,57 @@
+.loginOptions {
+  display: flex;
+  justify-content: end;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  font-size: 0.875rem;
+
+  label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #4b5563;
+    cursor: pointer;
+    user-select: none; // Tránh bôi đen text khi click
+
+    input[type="checkbox"] {
+      width: 1rem;
+      height: 1rem;
+      border-radius: 4px;
+      border: 1px solid #d1d5db;
+      accent-color: #2563eb; // Đổi màu tích xanh cho checkbox
+      cursor: pointer;
+    }
+  }
+
+  a {
+    color: #2563eb;
+    font-weight: 500;
+    text-decoration: none;
+    transition: color 0.2s;
+
+    &:hover {
+      color: #1d4ed8;
+      text-decoration: underline;
+    }
+  }
+}
+
+.authLink {
+  text-align: center;
+  margin-top: 1.5rem;
+  font-size: 0.875rem;
+  color: #4b5563;
+
+  a {
+    color: #2563eb;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.2s;
+    margin-left: 0.25rem;
+
+    &:hover {
+      color: #1d4ed8;
+      text-decoration: underline;
+    }
+  }
+}
