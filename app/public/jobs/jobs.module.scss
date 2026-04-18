@@ -1,0 +1,138 @@
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.searchSection {
+  margin-bottom: 2rem;
+}
+
+.mainLayout {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+
+  /* Desktop layout: 2 cột */
+  @media (min-width: 1024px) {
+    flex-direction: row;
+  }
+}
+
+.sidebar {
+  width: 100%;
+  flex-shrink: 0;
+
+  /* Cố định chiều rộng sidebar trên Desktop */
+  @media (min-width: 1024px) {
+    width: 280px;
+  }
+}
+
+.contentArea {
+  flex-grow: 1;
+}
+
+.listHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+
+  @media (min-width: 640px) {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .count {
+    color: #4b5563; /* gray-600 */
+    font-size: 0.875rem;
+  }
+
+  .sortBox {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: #374151; /* gray-700 */
+
+    select {
+      padding: 0.375rem 0.75rem;
+      border: 1px solid #d1d5db; /* gray-300 */
+      border-radius: 0.375rem;
+      outline: none;
+      background-color: #ffffff;
+      cursor: pointer;
+
+      &:focus {
+        border-color: #3b82f6; /* blue-500 */
+      }
+    }
+  }
+}
+
+.jobGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+
+  /* Desktop layout: 2 cột thẻ việc làm */
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+.loadingText {
+  grid-column: 1 / -1; // chiếm full chiều ngang grid
+  text-align: center;
+  padding: 40px 0;
+  font-size: 18px;
+  font-weight: 500;
+  color: #555;
+
+  /* hiệu ứng nhấp nháy nhẹ */
+  animation: fadePulse 1.5s infinite;
+}
+
+@keyframes fadePulse {
+  0% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.4;
+  }
+}
+
+.pagination {
+  margin-top: 30px;
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+
+  button {
+    padding: 6px 12px;
+    border: 1px solid #ddd;
+    background: white;
+    cursor: pointer;
+    border-radius: 6px;
+    color: black;
+
+    &:hover {
+      background: #f3f4f6;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+}
+
+.activePage {
+  background: #2563eb !important;
+  color: white;
+  border-color: #2563eb;
+}

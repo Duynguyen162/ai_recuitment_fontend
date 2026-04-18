@@ -31,11 +31,28 @@ export default function ResetPasswordPage() {
     if (!isValid) return;
 
     setLoading(true);
-
-    await axios.post("http://127.0.0.1:8000/api/v1/auth/reset-password", {
-      password,
-      token,
-    });
+    try {
+      const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/reset-password`,
+        {
+          password,
+          token,
+        },
+      );
+      if (res.status === 200) {
+        setIsSuccess(true);
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        alert(
+          error.response?.data?.detail || "Token không hợp lệ hoặc đã hết hạn",
+        );
+      } else {
+        alert("Không thể kết nối máy chủ");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -74,7 +91,7 @@ export default function ResetPasswordPage() {
         <div className={styles.successBox}>
           <p>Mật khẩu của bạn đã được thay đổi thành công!</p>
           <div className={styles.authLink}>
-            <Link href="/login">Đăng nhập ngay</Link>
+            <Link href="/auth/login">Đăng nhập ngay</Link>
           </div>
         </div>
       )}

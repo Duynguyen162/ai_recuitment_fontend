@@ -20,7 +20,7 @@ export default function ForgotPasswordPage() {
     setLoading(true);
     try {
       const res = await axios.post(
-        "http://127.0.0.1:8000/api/v1/auth/forgot-password",
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/forgot-password`,
         { email },
       );
       if (res.status === 200) {
