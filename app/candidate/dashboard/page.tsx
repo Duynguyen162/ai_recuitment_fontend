@@ -1,20 +1,15 @@
 "use client";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import axios from "axios";
+import { useLogout } from "@/hooks/useLogout";
+
 export default function DashboardPage() {
-  const router = useRouter();
+  const logout = useLogout();
 
   const handleLogout = async () => {
-    try {
-      // Gọi API đăng xuất nếu backend có
-      await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/logout`, {});
-    } catch (error) {
-      console.error("Logout error:", error);
-    } finally {
-      router.push("/auth/login");
-    }
+    logout();
+    redirect("/auth/login");
   };
-
   return (
     <div>
       <button onClick={handleLogout}>Đăng xuất</button>

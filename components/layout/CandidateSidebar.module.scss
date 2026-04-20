@@ -1,0 +1,88 @@
+.sidebar {
+  width: 260px;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  background-color: #ffffff;
+  border-right: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+}
+
+.logoArea {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  padding: 0 1.5rem;
+  border-bottom: 1px solid #f3f4f6;
+
+  .logo {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #1e40af;
+    text-decoration: none;
+    
+    span {
+      color: #0ea5e9;
+    }
+  }
+}
+
+.navMenu {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 1.25rem 0.75rem;
+}
+
+.menuGroup {
+  flex: 1;
+}
+
+.groupTitle {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #9ca3af;
+  text-transform: uppercase;
+  padding: 0 0.75rem;
+  margin-bottom: 0.75rem;
+  letter-spacing: 0.05em;
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  color: #4b5563;
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  margin-bottom: 0.25rem;
+
+  svg {
+    color: #6b7280;
+    transition: color 0.2s;
+  }
+
+  &:hover {
+    background-color: #f3f4f6;
+    color: #1e40af;
+    svg { color: #1e40af; }
+  }
+
+  &.active {
+    background-color: #eff6ff;
+    color: #1e40af;
+    svg { color: #1e40af; }
+  }
+}
+
+.footerMenu {
+  border-top: 1px solid #f3f4f6;
+  padding-top: 1rem;
+}

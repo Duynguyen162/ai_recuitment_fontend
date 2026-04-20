@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import cx from "classnames";
+import { usePathname } from "next/navigation";
 import {
   MapPin,
   DollarSign,
@@ -46,6 +47,11 @@ export default function JobCard({
     remote: "Làm từ xa",
   };
 
+  const pathname = usePathname();
+
+  const detailLink = pathname.startsWith("/candidate")
+    ? `/candidate/job_detail?id=${id}`
+    : `/public/job_detail?id=${id}`;
   return (
     <div className={styles.card}>
       <div className={styles.topRow}>
@@ -69,10 +75,7 @@ export default function JobCard({
         </button>
       </div>
 
-      <Link
-        href={`/public/job_detail?id=${id}`}
-        style={{ textDecoration: "none", flexGrow: 1 }}
-      >
+      <Link href={detailLink} style={{ textDecoration: "none", flexGrow: 1 }}>
         <h3 className={styles.title}>{title}</h3>
         <p className={styles.companyName}>{companyName}</p>
 

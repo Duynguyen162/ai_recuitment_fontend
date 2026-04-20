@@ -1,0 +1,21 @@
+.layoutWrapper {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f9fafb; // Màu nền xám nhạt cho toàn bộ App
+}
+
+.mainArea {
+  flex: 1;
+  margin-left: 260px; // Bằng chiều rộng của Sidebar
+  display: flex;
+  flex-direction: column;
+  min-width: 0; // Chống tràn layout trên flexbox
+}
+
+.content {
+  padding: 2rem;
+  flex: 1;
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto; // Căn giữa nội dung nếu màn hình quá rộng
+}
