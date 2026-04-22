@@ -1,0 +1,161 @@
+.sectionCard {
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+/* HEADER */
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #f3f4f6;
+  padding: 1rem 1.5rem;
+
+  h2 {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #111827;
+  }
+}
+
+.addBtnWrapper {
+  display: flex;
+  align-items: center;
+}
+
+/* FORM */
+.formWrapper {
+  padding: 1.5rem;
+  border-bottom: 1px solid #f3f4f6;
+
+  h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 1rem;
+  }
+}
+
+.inputGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+
+  @media (min-width: 640px) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* ACTION BUTTONS */
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.cancelBtn {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #4b5563;
+  background-color: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #f3f4f6;
+  }
+}
+
+.saveBtn {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #ffffff;
+  background-color: #1d4ed8;
+  border: none;
+  border-radius: 0.375rem;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #1e40af;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+/* LIST */
+.listContainer {
+  padding: 1rem 1.5rem;
+}
+
+.listItem {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid #f3f4f6;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.itemContent {
+  flex: 1;
+
+  h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 0.25rem;
+  }
+}
+
+.subText {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-bottom: 0.25rem;
+}
+
+.desc {
+  font-size: 0.875rem;
+  color: #374151;
+  line-height: 1.5;
+  white-space: pre-line;
+}
+
+/* ACTION */
+.itemActions {
+  display: flex;
+  align-items: flex-startl;
+  width: 4rem;
+  justify-content: space-around;
+}
+
+.deleteBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #9ca3af;
+
+  &:hover {
+    color: #ef4444;
+  }
+}
+.editBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #9ca3af;
+  &:hover {
+    color: #0018ec;
+  }
+}

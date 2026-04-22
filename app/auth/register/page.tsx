@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import AuthLayout from "../components/AuthLayout";
-import InputField from "../components/InputField"; // Import từ file riêng
-import Button from "../components/Button";
+import InputField from "../../../components/ui/InputField"; // Import từ file riêng
+import Button from "../../../components/ui/Button";
 import Link from "next/link";
 import styles from "./register.module.scss";
 import { useRouter } from "next/navigation";

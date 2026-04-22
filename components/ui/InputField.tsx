@@ -12,17 +12,16 @@ interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
 // Dùng forwardRef để hứng 'ref' từ React Hook Form
 const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
   ({ label, error, className, ...props }, ref) => {
-    const id = useId(); // Vẫn giữ nguyên useId của bạn để link label và input
-
+    const id = useId(); 
     return (
       <div className={styles.inputGroup}>
         <label htmlFor={id}>{label}</label>
 
         <input
           id={id}
-          ref={ref} // RẤT QUAN TRỌNG: Gắn ref vào đây để React Hook Form điều khiển
+          ref={ref} 
           className={`${styles.input} ${error ? styles.error : ""} ${className || ""}`}
-          {...props} // Rải toàn bộ các props còn lại (onChange, onBlur, name, type...) tự động
+          {...props} 
         />
 
         {error && <p className={styles.errorText}>{error}</p>}
@@ -31,7 +30,6 @@ const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
   }
 );
 
-// Khai báo displayName giúp debug dễ hơn trong React DevTools
 InputField.displayName = "InputField";
 
 export default InputField;
