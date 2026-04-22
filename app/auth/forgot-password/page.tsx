@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import AuthLayout from "../components/AuthLayout";
-import InputField from "../components/InputField";
-import Button from "../components/Button";
+import InputField from "../../../components/ui/InputField";
+import Button from "../../../components/ui/Button";
 import Link from "next/link";
 import styles from "./forgot-password.module.scss";
 import axios from "axios";

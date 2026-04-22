@@ -2,7 +2,7 @@ import axios from "axios";
 import { useAuthStore } from "@/store/authStore";
 
 const apiClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL, // http://localhost:8000
+  baseURL: process.env.NEXT_PUBLIC_API_URL,
 });
 
 // Tự động gắn "Authorization: Bearer <token>" vào mọi request
@@ -21,7 +21,7 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 401) {
       useAuthStore.getState().logout();
       deleteCookies();
-      window.location.href = "/auth/login";
+      window.location.replace("/auth/login");
     }
     return Promise.reject(error);
   }

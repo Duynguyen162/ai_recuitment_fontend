@@ -1,4 +1,3 @@
-/* src/app/(candidate)/layout.tsx */
 import React from "react";
 import CandidateSidebar from "@/components/layout/CandidateSidebar";
 import TopHeader from "@/components/layout/TopHeader";

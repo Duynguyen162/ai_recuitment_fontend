@@ -6,8 +6,8 @@ import Link from "next/link";
 import { useAuthStore } from "@/store/authStore";
 import apiClient from "@/lib/apiClient";
 import AuthLayout from "../components/AuthLayout";
-import InputField from "../components/InputField";
-import Button from "../components/Button";
+import InputField from "../../../components/ui/InputField";
+import Button from "../../../components/ui/Button";
 import SocialLogin from "../components/SocialLogin";
 import styles from "./login.module.scss";
 
@@ -96,7 +96,7 @@ export default function LoginPage() {
         <div className={styles.loginOptions}>
           <Link href="/auth/forgot-password">Quên mật khẩu?</Link>
         </div>
-        <Button disabled={!valid} loading={loading}>
+        <Button disabled={!valid} loading={loading} type="submit">
           Đăng nhập
         </Button>
       </form>

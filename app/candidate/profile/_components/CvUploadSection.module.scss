@@ -1,0 +1,113 @@
+.sectionCard {
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+
+  .titleArea {
+    h2 {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: #111827;
+      margin-bottom: 0.25rem;
+    }
+    p {
+      font-size: 0.875rem;
+      color: #6b7280;
+    }
+  }
+}
+
+.wrapBtnUpCv {
+  width: fit-content;
+}
+
+/* Khu vực hiển thị file đang chờ upload */
+.pendingFile {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  background-color: #f0f9ff;
+  border: 1px solid #bae6fd;
+  border-radius: 0.5rem;
+  margin-bottom: 1.5rem;
+
+  .fileInfo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    .fileName {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #0369a1;
+    }
+  }
+
+  .actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+}
+
+/* Danh sách CV chuyên nghiệp */
+.cvList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.cvItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: #3b82f6;
+    background-color: #f8fafc;
+  }
+
+  &.active {
+    border-left: 4px solid #3b82f6;
+    background-color: #eff6ff;
+  }
+
+  .cvMain {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    .icon {
+      color: #ef4444;
+    }
+
+    .text {
+      .name {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #1e293b;
+      }
+      .date {
+        font-size: 0.75rem;
+        color: #64748b;
+      }
+    }
+  }
+
+  .itemActions {
+    display: flex;
+    gap: 0.25rem;
+  }
+}
