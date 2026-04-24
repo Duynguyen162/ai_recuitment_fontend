@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import cx from "classnames";
 import styles from "./profile.module.scss";
 
-// Import các sub-components (Hãy đảm bảo bạn đã tạo đủ 4 file này trong folder _components)
 import BasicInfoForm from "./_components/BasicInfoForm";
 import ExperienceSection from "./_components/ExperienceSection";
 import EducationSection from "./_components/EducationSection";

@@ -16,21 +16,29 @@ dayjs.locale("vi");
 
 export default function JobsPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const keywordFromUrl = searchParams.get("keyword");
+
   const [searchQuery, setSearchQuery] = useState("");
-  const [sortOption, setSortOption] = useState("newest");
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const limit = 10;
   const [loading, setLoading] = useState(false);
+  const [jobResults, setJobResults] = useState<any[]>([]);
+  
   const [filters, setFilters] = useState<FilterParams>({
     location: "",
     jobType: "",
     experience: "",
   });
-  const searchParams = useSearchParams();
-  const keywordFromUrl = searchParams.get("keyword");
-  const [jobResults, setJobResults] = useState<any[]>([]);
+
+  // STATE MỚI: Quản lý trạng thái đóng/mở của bộ lọc
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+
   const totalPages = Math.ceil(total / limit);
+
+  // Tính số lượng bộ lọc đang được áp dụng (để hiển thị lên nút)
+  const activeFilterCount = Object.values(filters).filter(val => val !== "").length;
 
   useEffect(() => {
     if (keywordFromUrl) {
@@ -44,7 +52,6 @@ export default function JobsPage() {
       setLoading(true);
       try {
         const isSearching = searchQuery || filters.location || filters.jobType;
-
         const url = isSearching
           ? `${process.env.NEXT_PUBLIC_API_URL}/job/search_jobs`
           : `${process.env.NEXT_PUBLIC_API_URL}/job/job_proposed`;
@@ -73,13 +80,25 @@ export default function JobsPage() {
     fetchData();
   }, [page, searchQuery, filters]);
 
+  // TỰ ĐỘNG ĐÓNG BỘ LỌC khi chuyển trang
+  useEffect(() => {
+    setIsFilterOpen(false);
+  }, [page]);
+
   const handleSearch = (query: string) => {
+    setIsFilterOpen(false); // Đóng bộ lọc khi search
     router.push(`/public/jobs?keyword=${encodeURIComponent(query)}`);
   };
 
   const handleApplyFilter = (newFilters: FilterParams) => {
     setFilters(newFilters);
     setPage(1);
+    setIsFilterOpen(false); // Đóng bộ lọc sau khi áp dụng xong
+  };
+
+  const handleClearFilter = () => {
+    setFilters({ location: "", jobType: "", experience: "" });
+    setIsFilterOpen(false);
   };
 
   const handleBookmark = (id: string) => {
@@ -92,36 +111,47 @@ export default function JobsPage() {
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
-    // Cuộn lên đầu trang
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
     <div className={styles.container}>
-      <div className={styles.searchSection}>
-        <JobSearchBar initialQuery={searchQuery} onSearch={handleSearch} />
+      <div className={styles.topControls}>
+        {/* Hàng ngang chứa thanh Search và Nút mở Filter */}
+        <div className={styles.searchRow}>
+          <div className={styles.searchWrapper}>
+            <JobSearchBar initialQuery={searchQuery} onSearch={handleSearch} />
+          </div>
+          
+          <button 
+            className={`${styles.filterToggleBtn} ${isFilterOpen ? styles.active : ""}`}
+            onClick={() => setIsFilterOpen(!isFilterOpen)}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+            </svg>
+            Bộ lọc {activeFilterCount > 0 && <span className={styles.badge}>{activeFilterCount}</span>}
+          </button>
+        </div>
+        
+        {/* Khu vực chứa Component Lọc (Bị ẩn/hiện mượt mà nhờ CSS) */}
+        <div className={`${styles.filterExpandedArea} ${isFilterOpen ? styles.open : ""}`}>
+          <div className={styles.filterContent}>
+            <SidebarFilter
+              initialFilters={filters}
+              onApplyFilter={handleApplyFilter}
+              onClearFilter={handleClearFilter}
+            />
+          </div>
+        </div>
       </div>
 
       <div className={styles.mainLayout}>
-        <aside className={styles.sidebar}>
-          <SidebarFilter
-            initialFilters={filters}
-            onApplyFilter={handleApplyFilter}
-            onClearFilter={() =>
-              setFilters({ location: "", jobType: "", experience: "" })
-            }
-          />
-        </aside>
-
         <div className={styles.contentArea}>
           <div className={styles.listHeader}>
             <span className={styles.count}>
               Tìm thấy <b>{total}</b> việc làm phù hợp
             </span>
-            <div className={styles.sortBox}>{/* ... */}</div>
           </div>
 
           <div className={styles.jobGrid}>
@@ -149,16 +179,13 @@ export default function JobsPage() {
               ))
             )}
           </div>
-          {/* phân trang */}
+
           {totalPages > 0 && (
+             /* Giữ nguyên logic phân trang của bạn */
             <div className={styles.pagination}>
-              <button
-                disabled={page === 1}
-                onClick={() => handlePageChange(page - 1)}
-              >
+              <button disabled={page === 1} onClick={() => handlePageChange(page - 1)}>
                 Trang trước
               </button>
-
               {Array.from({ length: totalPages }, (_, i) => (
                 <button
                   key={i}
@@ -168,11 +195,7 @@ export default function JobsPage() {
                   {i + 1}
                 </button>
               ))}
-
-              <button
-                disabled={page === totalPages}
-                onClick={() => handlePageChange(page + 1)}
-              >
+              <button disabled={page === totalPages} onClick={() => handlePageChange(page + 1)}>
                 Trang sau
               </button>
             </div>

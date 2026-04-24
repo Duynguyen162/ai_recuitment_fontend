@@ -20,10 +20,25 @@
   gap: 1rem;
 }
 
+.menuBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #4b5563;
+
+  &:hover {
+    background-color: #f3f4f6;
+  }
+}
 .breadcrumb {
   font-size: 0.875rem;
   color: #6b7280; // gray-500
-  
+
   span {
     color: #111827; // gray-900
     font-weight: 600;
@@ -95,7 +110,7 @@
 
 .userInfo {
   display: none;
-  
+
   @media (min-width: 640px) {
     display: block;
   }
