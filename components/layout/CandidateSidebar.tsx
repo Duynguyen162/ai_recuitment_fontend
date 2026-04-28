@@ -22,8 +22,12 @@ const menuItems = [
   { name: "Dashboard", href: "/candidate/dashboard", icon: LayoutDashboard },
   { name: "Tìm việc làm", href: "/candidate/search_job", icon: Search },
   { name: "Hồ sơ của tôi", href: "/candidate/profile", icon: UserCircle },
-  { name: "Đơn ứng tuyển", href: "/candidate/applications", icon: FileText },
-  { name: "Job đã lưu", href: "/candidate/saved-jobs", icon: Bookmark },
+  {
+    name: "Đơn ứng tuyển",
+    href: "/candidate/job_applications",
+    icon: FileText,
+  },
+  { name: "Job đã lưu", href: "/candidate/save_job", icon: Bookmark },
   {
     name: "Công ty theo dõi",
     href: "/candidate/followed-companies",

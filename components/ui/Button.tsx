@@ -7,7 +7,7 @@ import styles from "./Button.module.scss";
 // Kế thừa các thuộc tính gốc của nút (onClick, className, id,...)
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   loading?: boolean;
-  variant?: "primary" | "outline" | "ghost";
+  variant?: "primary" | "outline" | "ghost" | "danger";
 }
 
 export default function Button({

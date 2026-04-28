@@ -15,7 +15,8 @@ import styles from "./CvUploadSection.module.scss";
 import Button from "@/components/ui/Button";
 import apiClient from "@/lib/apiClient";
 import toast, { Toaster } from "react-hot-toast";
-
+import { previewFileFromServer } from "@/utils/fileUtils";
+import ConfirmModal from "@/components/ui/ConfirmModal";
 interface UploadedCV {
   id: string;
   file_name: string;
@@ -29,6 +30,15 @@ export default function CvUploadSection() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [confirmModal, setConfirmModal] = useState<{
+    isOpen: boolean;
+    id: string | null;
+  }>({
+    isOpen: false,
+    id: null,
+  });
 
   // 1. Lấy danh sách CV từ API
   const fetchCVs = async () => {
@@ -84,45 +94,31 @@ export default function CvUploadSection() {
   // 4. Các thao tác trên danh sách
   const handlePreview = async (cvId: string) => {
     try {
-      // 1. Gọi API lấy file dưới dạng blob
-      const response = await apiClient.get(`/profiles/cv_upload/${cvId}/view`, {
-        responseType: "blob",
-      });
-
-      // 2. Tạo một Blob từ dữ liệu trả về
-      // Lưu ý: response.data lúc này là một Object Blob
-      const fileType = response.headers["content-type"] || "application/pdf";
-      const blob = new Blob([response.data], { type: fileType });
-
-      // 3. Tạo một URL tạm thời cho Blob này
-      const fileURL = URL.createObjectURL(blob);
-
-      // 4. Mở tab mới để xem
-      const newTab = window.open(fileURL, "_blank");
-
-      // 5. Giải phóng bộ nhớ sau khi tab đã tải (tùy chọn nhưng nên làm)
-      if (newTab) {
-        if (newTab) {
-          newTab.onload = () => {
-            setTimeout(() => URL.revokeObjectURL(fileURL), 1000);
-          };
-        }
-      }
+      await previewFileFromServer(cvId);
     } catch (error) {
-      console.error("Không thể xem CV:", error);
       toast.error(
         "Phiên đăng nhập đã hết hạn hoặc bạn không có quyền xem file này.",
       );
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Bạn muốn xóa CV này?")) return;
+  // Hàm này gắn vào thẻ onClick của nút Thùng Rác UI
+  const openDeleteConfirm = (id: string) => {
+    setConfirmModal({ isOpen: true, id: id });
+  };
+  const executeDelete = async () => {
+    if (!confirmModal.id) return;
+
+    setIsDeleting(true); // Bật loading của Modal
     try {
-      await apiClient.delete(`/profiles/cv_upload/${id}`);
-      setCvList((prev) => prev.filter((cv) => cv.id !== id));
+      await apiClient.delete(`/profiles/cv_upload/${confirmModal.id}`);
+      setCvList((prev) => prev.filter((cv) => cv.id !== confirmModal.id));
+      toast.success("Đã xóa CV thành công");
     } catch (error) {
       toast.error("Lỗi khi xóa");
+    } finally {
+      setIsDeleting(false);
+      setConfirmModal({ isOpen: false, id: null }); // Đóng modal và reset ID
     }
   };
 
@@ -215,7 +211,7 @@ export default function CvUploadSection() {
 
                 <Button
                   variant="ghost"
-                  onClick={() => handleDelete(cv.id)}
+                  onClick={() => openDeleteConfirm(cv.id)}
                   style={{ color: "#ef4444" }}
                 >
                   <Trash2 size={18} />
@@ -225,6 +221,16 @@ export default function CvUploadSection() {
           ))
         )}
       </div>
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        title="Xóa hồ sơ CV"
+        message="Bạn có chắc chắn muốn xóa bản CV này không? Hành động này không thể hoàn tác."
+        confirmText="Xóa CV"
+        cancelText="Giữ lại"
+        onConfirm={executeDelete}
+        onCancel={() => setConfirmModal({ isOpen: false, id: null })}
+        isLoading={isDeleting}
+      />
       <Toaster />
     </div>
   );

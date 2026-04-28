@@ -15,6 +15,12 @@ import {
 import axios from "axios";
 import styles from "./JobDetail.module.scss";
 import { useSearchParams } from "next/navigation";
+import apiClient from "@/lib/apiClient";
+import toast, { Toaster } from "react-hot-toast";
+import ApplyJobModal from "./ApplyJobModal";
+import ConfirmModal from "../ui/ConfirmModal";
+import { formatDate } from "@/utils/formatDate";
+import { formatSalary } from "@/utils/formatSalary";
 
 // Giao diện dữ liệu chuẩn theo API cung cấp
 interface Company {
@@ -38,11 +44,14 @@ interface JobData {
   created_at: string;
   expired_at: string;
   company: Company;
+  is_save: boolean;
+  has_applied: boolean;
 }
 
 export default function JobDetailPage() {
   const [job, setJob] = useState<JobData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isSaved, setIsSaved] = useState(false);
   const [error, setError] = useState("");
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
@@ -52,14 +61,25 @@ export default function JobDetailPage() {
   const [hasApplied, setHasApplied] = useState(false);
   const [aiScore, setAiScore] = useState<number | null>(null);
 
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [confirmModal, setConfirmModal] = useState<{
+    isOpen: boolean;
+    id: string | null;
+  }>({
+    isOpen: false,
+    id: null,
+  });
+  const [confirmUnsave, setConfirmUnsave] = useState(false);
+  const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
+
   useEffect(() => {
     const fetchJobDetail = async () => {
       try {
-        const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL}/job/job_detail/${id}`,
-        );
+        const res = await apiClient.get(`/job/job_detail/${id}`);
         if (res.data.success) {
           setJob(res.data.data);
+          setHasApplied(res.data.data.has_applied);
+          setIsSaved(res.data.data.is_save);
         } else {
           setError("Không thể tải thông tin việc làm.");
         }
@@ -73,19 +93,6 @@ export default function JobDetailPage() {
 
     fetchJobDetail();
   }, [id]);
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("vi-VN").format(amount) + " VNĐ";
-  };
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("vi-VN", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    });
-  };
 
   if (loading) {
     return (
@@ -110,6 +117,48 @@ export default function JobDetailPage() {
       </div>
     );
   }
+
+  const openDeleteConfirm = (id: string) => {
+    setConfirmModal({ isOpen: true, id: id });
+  };
+  const executeDelete = async (id: string) => {
+    if (!confirmModal.id) return;
+
+    setIsDeleting(true); // Bật loading của Modal
+    try {
+      await apiClient.delete("/application/delete_apply", {
+        params: { job_id: id },
+      });
+      setHasApplied(false);
+      toast.success("Đã xóa CV thành công");
+    } catch (error) {
+      toast.error("Lỗi khi xóa");
+    } finally {
+      setIsDeleting(false);
+      setConfirmModal({ isOpen: false, id: null }); // Đóng modal và reset ID
+    }
+  };
+
+  const handleSaveJob = async (jobId: number) => {
+    try {
+      await apiClient.post(`/job/save_job/${jobId}`);
+      setIsSaved(true);
+      toast.success("Đã lưu công việc");
+    } catch (error) {
+      toast.error("Lỗi khi lưu công việc");
+    }
+  };
+  const handleUnsaveJob = async (jobId: number) => {
+    try {
+      await apiClient.delete(`/job/delete_saved_job`, {
+        params: { job_id: jobId },
+      });
+      setIsSaved(false);
+      toast.success("Đã bỏ lưu công việc");
+    } catch (error) {
+      toast.error("Lỗi khi bỏ lưu");
+    }
+  };
 
   return (
     <div className={styles.container}>
@@ -141,8 +190,7 @@ export default function JobDetailPage() {
               </div>
               <div className={cx(styles.metaItem, styles.salary)}>
                 <DollarSign />
-                {formatCurrency(job.salary_min)} -{" "}
-                {formatCurrency(job.salary_max)}
+                {formatSalary(job.salary_min, job.salary_max)}
               </div>
               <div className={styles.metaItem}>
                 <Calendar /> Hạn nộp: {formatDate(job.expired_at)}
@@ -201,18 +249,46 @@ export default function JobDetailPage() {
           <div className={styles.stickyPanel}>
             <div className={styles.actionCard}>
               <button
-                className={styles.applyBtn}
-                disabled={hasApplied || job.status !== "published"}
+                className={hasApplied ? styles.dltApplyBtn : styles.applyBtn}
+                disabled={job.status !== "published"}
+                onClick={() => {
+                  if (hasApplied) {
+                    openDeleteConfirm(job.id.toString());
+                  } else {
+                    setIsApplyModalOpen(true);
+                  }
+                }}
               >
                 {hasApplied
-                  ? "Đã ứng tuyển"
+                  ? "Hủy ứng tuyển"
                   : job.status !== "published"
                     ? "Tin đã đóng"
                     : "Ứng tuyển ngay"}
               </button>
 
-              <button className={styles.saveBtn}>
-                <Bookmark /> Lưu việc làm
+              {/* NHÚNG MODAL */}
+              {isApplyModalOpen && (
+                <ApplyJobModal
+                  jobId={job.id.toString()}
+                  jobTitle={job.title}
+                  onClose={() => setIsApplyModalOpen(false)}
+                  onSuccess={() => {
+                    setHasApplied(true);
+                  }}
+                />
+              )}
+              <button
+                className={cx(styles.saveBtn, { [styles.saved]: isSaved })}
+                onClick={() => {
+                  if (isSaved) {
+                    setConfirmUnsave(true);
+                  } else {
+                    handleSaveJob(job.id);
+                  }
+                }}
+              >
+                <Bookmark fill={isSaved ? "#0284c7" : "none"} />
+                {isSaved ? "Đã lưu" : "Lưu việc làm"}
               </button>
 
               {aiScore && (
@@ -240,6 +316,29 @@ export default function JobDetailPage() {
           </div>
         </aside>
       </div>
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        title="Rút đơn ứng tuyển"
+        message="Bạn có chắc chắn muốn rút đơn ứng tuyển này không? Hành động này không thể hoàn tác."
+        confirmText="Rút đơn"
+        cancelText="Giữ lại"
+        onConfirm={() => executeDelete(confirmModal.id!)}
+        onCancel={() => setConfirmModal({ isOpen: false, id: null })}
+        isLoading={isDeleting}
+      />
+      <ConfirmModal
+        isOpen={confirmUnsave}
+        title="Bỏ lưu công việc"
+        message="Bạn có chắc muốn bỏ lưu công việc này không?"
+        confirmText="Bỏ lưu"
+        cancelText="Hủy"
+        onConfirm={async () => {
+          await handleUnsaveJob(job.id);
+          setConfirmUnsave(false);
+        }}
+        onCancel={() => setConfirmUnsave(false)}
+      />
+      <Toaster />
     </div>
   );
 }
