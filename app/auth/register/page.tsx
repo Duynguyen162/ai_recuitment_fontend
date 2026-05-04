@@ -12,6 +12,7 @@ import axios from "axios";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { registerSchema, RegisterInput } from "@/validations/auth.schema";
+import toast, { Toaster } from "react-hot-toast";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -35,7 +36,7 @@ export default function RegisterPage() {
 
     try {
       const res = await axios.post(
-        "http://127.0.0.1:8000/api/v1/auth/register",
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/register`,
         {
           email: data.email,
           password: data.password,
@@ -43,7 +44,7 @@ export default function RegisterPage() {
         },
       );
 
-      alert("Đăng ký thành công!");
+      toast.success("Đăng ký thành công!");
       router.push("/auth/login");
     } catch (error: any) {
       if (axios.isAxiosError(error)) {
@@ -55,10 +56,10 @@ export default function RegisterPage() {
             setError(field, { message: err.msg });
           });
         } else {
-          alert(data?.detail || "Đã xảy ra lỗi");
+          toast.error("Đã xảy ra lỗi");
         }
       } else {
-        alert("Không thể kết nối máy chủ");
+        toast.error("Không thể kết nối máy chủ");
       }
     } finally {
       setLoading(false);
@@ -104,7 +105,7 @@ export default function RegisterPage() {
           )}
         </div>
 
-        <Button disabled={!isValid} loading={loading}>
+        <Button disabled={!isValid} loading={loading} type="submit">
           Đăng ký
         </Button>
       </form>
@@ -115,4 +116,5 @@ export default function RegisterPage() {
       </p>
     </AuthLayout>
   );
+  <Toaster />;
 }

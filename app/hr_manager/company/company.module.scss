@@ -1,0 +1,264 @@
+.pageContainer {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.loading {
+  text-align: center;
+  padding: 2rem;
+}
+
+.statusBanner {
+  padding: 1rem;
+  border-radius: 0.75rem;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.statusBannerRejected,
+.statusBannerPending {
+  padding: 1rem;
+  border-radius: 0.75rem;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  color: #b45309;
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+.verifiedSuccess {
+  padding: 1rem;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #059669;
+  border-radius: 0.75rem;
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.logoCard {
+  background: #fff;
+  color: rgb(56, 56, 56);
+  border-radius: 1rem;
+  padding: 2rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.06);
+}
+
+.logoCard h2 {
+  margin-bottom: 1.25rem;
+}
+
+.sectionCard {
+  background: #fff;
+  color: rgb(56, 56, 56);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.05);
+}
+
+.sectionCard h2 {
+  margin-bottom: 1rem;
+}
+
+.formGroup {
+  margin-bottom: 1.5rem;
+}
+
+.formGroup label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #111827;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.select {
+  min-height: 2.75rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: 0.5rem;
+  border: 1px solid #d1d5db;
+  width: 100%;
+  background: #fff;
+  color: #111827;
+}
+
+.error {
+  color: #dc2626;
+  font-size: 0.85rem;
+}
+
+.uploadPanel {
+  border: 1px solid #dbe3ee;
+  border-radius: 1rem;
+  background: linear-gradient(180deg, #f8fbff 0%, #fdfefe 100%);
+  padding: 1.25rem;
+}
+
+.logoSection {
+  display: grid;
+  grid-template-columns: 152px minmax(0, 1fr);
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.logoPreview {
+  position: relative;
+  width: 152px;
+  height: 152px;
+  border-radius: 1rem;
+  border: 1px solid #cbd5e1;
+  background: #eef4ff;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logoPreview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.logoPlaceholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  color: #64748b;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.logoActions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+
+.uploadRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.uploadTitle {
+  color: #0f172a;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.uploadHint {
+  margin: 0.35rem 0 0;
+  color: #64748b;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.hiddenInput {
+  display: none;
+}
+
+.uploadButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 2.75rem;
+  padding: 0.75rem 1.1rem;
+  border-radius: 999px;
+  background: #0f172a;
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease,
+    background 0.2s ease;
+}
+
+.uploadButton:hover {
+  transform: translateY(-1px);
+  background: #1e293b;
+}
+
+.uploadButtonDisabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.spinningIcon {
+  animation: spin 0.9s linear infinite;
+}
+
+.fileMeta {
+  color: #475569;
+  font-size: 0.9rem;
+}
+
+.fileStatus {
+  margin-top: 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.8rem 1rem;
+  border-radius: 0.8rem;
+  background: #ecfdf5;
+  color: #047857;
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.submitBtn {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1.5rem;
+}
+
+@media (max-width: 640px) {
+  .pageContainer {
+    padding: 1rem;
+  }
+
+  .logoCard,
+  .sectionCard {
+    padding: 1.25rem;
+  }
+
+  .logoSection {
+    grid-template-columns: 1fr;
+  }
+
+  .logoPreview {
+    width: 120px;
+    height: 120px;
+  }
+
+  .uploadRow {
+    align-items: flex-start;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}

@@ -14,8 +14,8 @@ export default function Button({
   children,
   disabled,
   loading,
-  type = "button", // Đổi mặc định thành "button" để tránh vô tình submit form
-  variant = "primary", // Mặc định là nút chính (nền màu)
+  type = "button", 
+  variant = "primary",
   className,
   ...props
 }: ButtonProps) {

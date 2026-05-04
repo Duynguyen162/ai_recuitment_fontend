@@ -1,0 +1,351 @@
+/* src/app/(employer)/EmployerLayout.module.scss */
+
+.layoutContainer {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f8fafc; // Nền xám nhạt chuẩn SaaS
+}
+
+/* --- SIDEBAR --- */
+.sidebar {
+  width: 260px;
+  background-color: #1e293b; // Màu xanh slate đậm
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  z-index: 100;
+
+  &.closed {
+    width: 80px;
+
+    .navLabel,
+    .logoText span {
+      display: none;
+    }
+
+    .logoArea {
+      justify-content: center;
+    }
+
+    .navItem {
+      justify-content: center;
+      padding: 0.75rem;
+    }
+  }
+}
+
+.logoArea {
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  height: 64px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+  .logoText {
+    font-size: 1.25rem;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    color: #3b82f6;
+
+    span {
+      color: #ffffff;
+      margin-left: 0.25rem;
+    }
+  }
+}
+
+.navMenu {
+  flex: 1;
+  padding: 1rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  color: #94a3b8;
+  text-decoration: none;
+  border-radius: 0.5rem;
+  transition: all 0.2s;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: #ffffff;
+  }
+
+  &.active {
+    background-color: #3b82f6;
+    color: #ffffff;
+  }
+
+  .navLabel {
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+}
+
+.logoutArea {
+  padding: 1rem 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logoutBtn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: none;
+  border: none;
+  color: #f87171;
+  cursor: pointer;
+  border-radius: 0.5rem;
+  transition: background 0.2s;
+
+  &:hover {
+    background-color: rgba(239, 68, 68, 0.1);
+  }
+}
+
+/* --- MAIN WRAPPER --- */
+.mainWrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0; // Fix lỗi flex child tràn màn hình
+}
+
+.topHeader {
+  height: 64px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.5rem;
+  position: sticky;
+  top: 0;
+  z-index: 90;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  .toggleBtn {
+    background: none;
+    border: none;
+    color: #64748b;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    padding: 0.25rem;
+    border-radius: 0.25rem;
+
+    &:hover {
+      background-color: #f1f5f9;
+    }
+  }
+
+  .pageTitle {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #1e293b;
+  }
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.notiBtn {
+  position: relative;
+  background: none;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+
+  &:hover {
+    background-color: #f1f5f9;
+  }
+
+  .badge {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background-color: #ef4444;
+    color: #ffffff;
+    font-size: 0.625rem;
+    font-weight: 700;
+    min-width: 16px;
+    height: 16px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #ffffff;
+  }
+}
+
+.userProfile {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding-left: 1.5rem;
+  border-left: 1px solid #e2e8f0;
+
+  .avatar {
+    width: 36px;
+    height: 36px;
+    background-color: #3b82f6;
+    color: #ffffff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.875rem;
+  }
+
+  .userInfo {
+    display: flex;
+    flex-direction: column;
+
+    .userName {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #1e293b;
+    }
+
+    .userRole {
+      font-size: 0.75rem;
+      color: #64748b;
+    }
+  }
+}
+
+.pageContent {
+  padding: 2rem;
+  flex: 1;
+  overflow-y: auto;
+}
+.upsellVipBox {
+  margin: 1rem;
+  padding: 1.25rem;
+  background: linear-gradient(
+    135deg,
+    rgba(59, 130, 246, 0.1) 0%,
+    rgba(168, 85, 247, 0.1) 100%
+  );
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  border-radius: 0.75rem;
+  text-align: center;
+
+  .vipIcon {
+    color: #a855f7;
+    margin-bottom: 0.5rem;
+    display: flex;
+    justify-content: center;
+  }
+  h4 {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #f8fafc;
+    margin-bottom: 0.25rem;
+  }
+  p {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    line-height: 1.4;
+    margin-bottom: 1rem;
+  }
+
+  .upgradeBtn {
+    display: inline-block;
+    width: 100%;
+    padding: 0.5rem;
+    background-color: #a855f7;
+    color: white;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    transition: background 0.2s;
+    &:hover {
+      background-color: #9333ea;
+    }
+  }
+}
+
+.sidebarFooter {
+  padding: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: auto; /* Đẩy footer xuống đáy sidebar */
+}
+
+.userInfoMini {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  .userAvatar {
+    width: 36px;
+    height: 36px;
+    background-color: #334155;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    &.vipBorder {
+      border: 2px solid #fbbf24;
+    } /* Viền vàng nếu là VIP */
+  }
+  .userMeta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  .userName {
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+  .freeTag {
+    font-size: 0.625rem;
+    color: #94a3b8;
+    background: #334155;
+    padding: 2px 6px;
+    border-radius: 4px;
+    display: inline-block;
+    margin-top: 2px;
+  }
+  .vipTag {
+    font-size: 0.625rem;
+    color: #78350f;
+    background: #fbbf24;
+    padding: 2px 6px;
+    border-radius: 4px;
+    display: inline-block;
+    margin-top: 2px;
+    font-weight: 600;
+  }
+  .verifyTag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.625rem;
+    color: #86efac;
+  }
+}
