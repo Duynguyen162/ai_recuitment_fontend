@@ -1,0 +1,102 @@
+/* src/components/ApplyJobModal.module.scss */
+
+.overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50; /* Đảm bảo nằm đè lên mọi thứ */
+  padding: 1rem;
+}
+
+.modalContent {
+  background: #ffffff;
+  width: 100%;
+  max-width: 500px;
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+
+  h2 { font-size: 1.25rem; font-weight: 700; color: #111827; }
+  .jobTitle { font-size: 0.875rem; color: #3b82f6; font-weight: 500; margin-top: 0.25rem; }
+  
+  .closeBtn {
+    background: none; border: none; color: #9ca3af; cursor: pointer;
+    &:hover { color: #111827; }
+  }
+}
+
+.body {
+  padding: 1.5rem;
+  max-height: 60vh;
+  overflow-y: auto;
+
+  h3 { font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 1rem; }
+}
+
+.cvOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.cvCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover { border-color: #cbd5e1; background-color: #f8fafc; }
+
+  /* Hiệu ứng khi Card được chọn */
+  &.selected {
+    border-color: #3b82f6;
+    background-color: #eff6ff;
+  }
+
+  .cvInfo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    .iconWrapper {
+      padding: 0.5rem; border-radius: 0.5rem;
+      &.profileIcon { background-color: #e0e7ff; color: #4f46e5; }
+      &.uploadIcon { background-color: #ffe4e6; color: #e11d48; }
+    }
+
+    .cvName { font-size: 0.875rem; font-weight: 600; color: #1f2937; }
+    .cvDesc { font-size: 0.75rem; color: #6b7280; margin-top: 0.25rem; }
+  }
+
+  .checkIcon { color: #3b82f6; }
+}
+
+.footer {
+  padding: 1.25rem 1.5rem;
+  background-color: #f9fafb;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}

@@ -1,0 +1,145 @@
+.pageContainer {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.pageHeader {
+  margin-bottom: 2rem;
+
+  h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 0.5rem 0;
+  }
+
+  p {
+    color: #64748b;
+    margin: 0;
+  }
+}
+
+.loader {
+  text-align: center;
+  padding: 4rem;
+  color: #64748b;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px dashed #cbd5e1;
+
+  .emptyIcon {
+    color: #94a3b8;
+    margin-bottom: 1rem;
+  }
+
+  p {
+    color: #64748b;
+    margin-bottom: 1.5rem;
+  }
+}
+
+.jobList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.jobCard {
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  padding: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: #cbd5e1;
+    box-shadow:
+      0 4px 6px -1px rgba(0, 0, 0, 0.05),
+      0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  }
+
+  /* Responsive cho Mobile */
+  @media (max-width: 640px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+  }
+}
+
+.jobMainInfo {
+  flex: 1;
+}
+
+.jobTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #0f172a;
+  text-decoration: none;
+  display: block;
+  margin-bottom: 0.5rem;
+
+  &:hover {
+    color: #0284c7; /* Màu xanh Primary */
+  }
+}
+
+.companyName {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #475569;
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+}
+
+.tagsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.tag {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.85rem;
+  color: #64748b;
+  background: #f8fafc;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  border: 1px solid #f1f5f9;
+}
+
+.jobActions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+
+  @media (max-width: 640px) {
+    width: 100%;
+    /* Trên mobile, 2 nút sẽ giãn đều 2 bên */
+    > * {
+      flex: 1;
+      justify-content: center;
+    }
+  }
+}
+.secondaryAction button {
+  padding: 0.35rem 0.5rem;
+  font-size: 0.8rem;
+  min-width: auto;
+}
+
+.primaryAction button {
+  padding: 0.4rem 0.75rem;
+  font-size: 0.85rem;
+}
