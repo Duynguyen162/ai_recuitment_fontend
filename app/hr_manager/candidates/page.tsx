@@ -1,503 +1,501 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, {
+    useCallback,
+    useDeferredValue,
+    useEffect,
+    useMemo,
+    useState,
+    useRef,
+} from "react";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
-  Search,
-  Lock,
-  CheckSquare,
-  Sparkles,
-  Eye,
-  ArrowRight,
-  X,
-  TriangleAlert,
-  BadgeCheck,
-  CircleAlert,
+    ArrowRight,
+    BriefcaseBusiness,
+    CalendarDays,
+    Eye,
+    Lock,
+    Search,
+    Sparkles,
+    Users,
 } from "lucide-react";
 import cx from "classnames";
-import styles from "./candidates.module.scss";
-import Button from "@/components/ui/Button";
 import toast, { Toaster } from "react-hot-toast";
+
+import Button from "@/components/ui/Button";
 import { useCompanyProfile } from "@/hooks/useCompanyProfile";
+import apiClient from "@/lib/apiClient";
+import { previewFileFromServer } from "@/utils/fileUtils";
 
-type AppStatus = "applied" | "interviewing" | "hired" | "rejected";
-
-interface Applicant {
-  id: string;
-  candidate_name: string;
-  email: string;
-  applied_at: string;
-  ai_score: number;
-  ai_summary: string;
-  ai_strengths: string[];
-  ai_risks: string[];
-  recommendation: string;
-  status: AppStatus;
-}
+import AiReviewModal from "./_components/AiReviewModal";
+import ApplicantsTable from "./_components/ApplicantsTable";
+import InterviewNotesModal from "./_components/InterviewNotesModal";
+import InterviewScheduleModal from "./_components/InterviewScheduleModal";
+import JobSidebar from "./_components/JobSidebar";
+import { TAB_ORDER, getTabLabel } from "./_lib/constants";
+import { filterApplicants, formatJobStatus } from "./_lib/helpers";
+import { normalizeApplicant, normalizeJob } from "./_lib/normalizers";
+import {
+    Applicant,
+    AppStatus,
+    CandidatesTab,
+    HrJob,
+    InterviewScheduleFormValues,
+} from "./_lib/types";
+import styles from "./candidates.module.scss";
 
 export default function JobApplicantsPage() {
-  const [loading, setLoading] = useState(true);
-  const [applicants, setApplicants] = useState<Applicant[]>([]);
-  const [activeTab, setActiveTab] = useState<"all" | AppStatus>("all");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedApplicant, setSelectedApplicant] = useState<Applicant | null>(
-    null,
-  );
-  const { isVip, loading: loadingCompany } = useCompanyProfile();
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const initialJobIdRef = useRef(searchParams.get("jobId"));
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // TODO: Thay bằng API thật khi backend sẵn sàng.
-        // const res = await apiClient.get(`/hr/jobs/${jobId}/applicants`, {
-        //   params: { status: activeTab === "all" ? undefined : activeTab, q: searchQuery },
-        // });
-        // setApplicants(res.data.data);
-        setApplicants([
-          {
-            id: "app-1",
-            candidate_name: "Nguyễn Quang Duy",
-            email: "duy@gmail.com",
-            applied_at: "2026-04-28",
-            ai_score: 92,
-            ai_summary:
-              "Ứng viên có độ phù hợp rất cao với JD Frontend, nền tảng React mạnh và có tư duy sản phẩm tốt.",
-            ai_strengths: [
-              "Kinh nghiệm React và TypeScript bám sát yêu cầu vị trí.",
-              "Có dự án thực tế với tối ưu hiệu năng và kiến trúc component.",
-              "Khả năng trình bày rõ ràng, CV nêu bật thành tích định lượng.",
-            ],
-            ai_risks: [
-              "Kinh nghiệm dẫn dắt đội nhóm chưa thể hiện rõ trong CV.",
-              "Cần xác minh thêm khả năng mentoring junior.",
-            ],
-            recommendation:
-              "Nên ưu tiên mời phỏng vấn vòng 1 trong nhóm ứng viên đầu tiên.",
-            status: "applied",
-          },
-          {
-            id: "app-2",
-            candidate_name: "Trần Lê B",
-            email: "tranleb@gmail.com",
-            applied_at: "2026-04-27",
-            ai_score: 75,
-            ai_summary:
-              "Ứng viên có nền tảng backend tốt nhưng cần đánh giá thêm mức độ phù hợp với môi trường sản phẩm tăng trưởng nhanh.",
-            ai_strengths: [
-              "Có kinh nghiệm Node.js và thiết kế API rõ ràng.",
-              "Từng làm việc với môi trường production và CI/CD.",
-            ],
-            ai_risks: [
-              "Chưa thấy rõ kinh nghiệm với microservice quy mô lớn.",
-              "Thiếu minh chứng về phối hợp liên phòng ban.",
-            ],
-            recommendation:
-              "Phù hợp để phỏng vấn sâu thêm về hệ thống và khả năng phối hợp.",
-            status: "interviewing",
-          },
-          {
-            id: "app-3",
-            candidate_name: "Lê Thị C",
-            email: "lethic@gmail.com",
-            applied_at: "2026-04-26",
-            ai_score: 45,
-            ai_summary:
-              "Mức độ phù hợp hiện tại thấp do thiếu các kỹ năng chính và chưa có kinh nghiệm sát với vị trí đang tuyển.",
-            ai_strengths: [
-              "CV trình bày gọn, có thái độ học hỏi tốt.",
-            ],
-            ai_risks: [
-              "Thiếu kỹ năng chuyên môn cốt lõi theo JD.",
-              "Kinh nghiệm thực tế trong domain liên quan còn hạn chế.",
-            ],
-            recommendation:
-              "Chỉ nên giữ trong nhóm dự phòng nếu công ty có thể đào tạo thêm.",
-            status: "rejected",
-          },
-        ]);
-      } catch {
-        toast.error("Không thể tải danh sách ứng viên");
-      } finally {
-        setLoading(false);
-      }
-    };
+    const [jobs, setJobs] = useState<HrJob[]>([]);
+    const [jobsLoading, setJobsLoading] = useState(true);
+    const [applicantsLoading, setApplicantsLoading] = useState(false);
+    const [selectedJobId, setSelectedJobId] = useState<number | null>(
+        initialJobIdRef.current ? Number(initialJobIdRef.current) : null,
+    );
+    const [applicants, setApplicants] = useState<Applicant[]>([]);
+    const [activeTab, setActiveTab] = useState<CandidatesTab>("all");
+    const [searchQuery, setSearchQuery] = useState("");
+    const deferredSearchQuery = useDeferredValue(searchQuery);
+    const [selectedApplicant, setSelectedApplicant] = useState<Applicant | null>(
+        null,
+    );
+    const [scheduleApplicant, setScheduleApplicant] = useState<Applicant | null>(
+        null,
+    );
+    const [notesApplicant, setNotesApplicant] = useState<Applicant | null>(null);
+    const { isVip, loading: loadingCompany } = useCompanyProfile();
 
-    fetchData();
-  }, [activeTab]);
+    const fetchJobs = useCallback(async () => {
+        setJobsLoading(true);
+        try {
+            const response = await apiClient.get("/job/get_jobs_create_by_hr", {
+                params: { page: 1, page_size: 100 },
+            });
+            const rawJobs: unknown[] = Array.isArray(response.data?.data)
+                ? (response.data.data as unknown[])
+                : [];
 
-  useEffect(() => {
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
+            const normalizedJobs: HrJob[] = rawJobs
+                .map(normalizeJob)
+                .filter((job): job is HrJob => job !== null);
+
+            setJobs(normalizedJobs);
+
+            if (normalizedJobs.length === 0) {
+                setSelectedJobId(null);
+                setApplicants([]);
+                return;
+            }
+
+            const preferredJobId =
+                initialJobIdRef.current &&
+                    normalizedJobs.some((job) => job.id === Number(initialJobIdRef.current))
+                    ? Number(initialJobIdRef.current)
+                    : normalizedJobs[0].id;
+
+            setSelectedJobId(preferredJobId);
+
+            if (String(preferredJobId) !== initialJobIdRef.current) {
+                router.replace(`/hr_manager/candidates?jobId=${preferredJobId}`, { scroll: false });
+            }
+        } catch {
+            toast.error("Không thể tải danh sách job");
+            setJobs([]);
+            setSelectedJobId(null);
+        } finally {
+            setJobsLoading(false);
+        }
+    }, [router]);
+
+    useEffect(() => {
+        fetchJobs();
+    }, [fetchJobs]);
+
+    useEffect(() => {
+        const handleEscape = (event: KeyboardEvent) => {
+            if (event.key === "Escape") {
+                setSelectedApplicant(null);
+                setScheduleApplicant(null);
+                setNotesApplicant(null);
+            }
+        };
+
+        window.addEventListener("keydown", handleEscape);
+        return () => window.removeEventListener("keydown", handleEscape);
+    }, []);
+
+    useEffect(() => {
+        if (!selectedJobId) {
+            setApplicants([]);
+            return;
+        }
+
+        const fetchApplicants = async () => {
+            setApplicantsLoading(true);
+            try {
+                const response = await apiClient.get(
+                    `/application/list_candidate/${selectedJobId}`,
+                );
+                const rawApplicants: unknown[] = Array.isArray(response.data?.data)
+                    ? (response.data.data as unknown[])
+                    : [];
+
+                const normalizedApplicants: Applicant[] = rawApplicants
+                    .map(normalizeApplicant)
+                    .filter((app): app is Applicant => app !== null);
+
+                setApplicants(normalizedApplicants);
+            } catch {
+                toast.error("Không thể tải danh sách ứng viên của job này");
+                setApplicants([]);
+            } finally {
+                setApplicantsLoading(false);
+            }
+        };
+
+        fetchApplicants();
+    }, [selectedJobId]);
+
+    useEffect(() => {
+        setActiveTab("all");
+        setSearchQuery("");
         setSelectedApplicant(null);
-      }
+        setScheduleApplicant(null);
+        setNotesApplicant(null);
+    }, [selectedJobId]);
+
+    const selectedJob = useMemo(
+        () => jobs.find((job) => job.id === selectedJobId) ?? null,
+        [jobs, selectedJobId],
+    );
+
+    const counts = useMemo(
+        () => ({
+            all: applicants.length,
+            applied: applicants.filter((app) => app.status === "applied").length,
+            interviewing: applicants.filter((app) => app.status === "interviewing")
+                .length,
+            hired: applicants.filter((app) => app.status === "hired").length,
+            rejected: applicants.filter((app) => app.status === "rejected").length,
+            withdrawn: applicants.filter((app) => app.status === "withdrawn").length,
+            left_company: applicants.filter((app) => app.status === "left_company").length,
+        }),
+        [applicants],
+    );
+
+    const filteredApplicants = useMemo(
+        () => filterApplicants(applicants, activeTab, deferredSearchQuery),
+        [activeTab, applicants, deferredSearchQuery],
+    );
+
+    const openAiReview = (applicant: Applicant) => {
+        if (!isVip) {
+            toast("Cần gói VIP để xem chi tiết nhận xét AI");
+            return;
+        }
+
+        setSelectedApplicant(applicant);
     };
 
-    window.addEventListener("keydown", handleEscape);
-    return () => window.removeEventListener("keydown", handleEscape);
-  }, []);
+    const handleSelectJob = (jobId: number) => {
+        setSelectedJobId(jobId);
+        router.replace(`/hr_manager/candidates?jobId=${jobId}`, {
+            scroll: false,
+        });
+    };
 
-  const handleStatusUpdate = async (appId: string, newStatus: AppStatus) => {
-    try {
-      // TODO: Thay bằng API cập nhật trạng thái ứng viên.
-      // await apiClient.put(`/hr/applications/${appId}/status`, { status: newStatus });
-      setApplicants((prev) =>
-        prev.map((app) =>
-          app.id === appId ? { ...app, status: newStatus } : app,
-        ),
-      );
-      toast.success("Đã cập nhật trạng thái");
-    } catch {
-      toast.error("Lỗi cập nhật trạng thái");
-    }
-  };
+    const updateApplicantState = (
+        applicantId: string,
+        updates: Partial<Applicant>,
+        successMessage: string,
+    ) => {
 
-  const openAiReview = (applicant: Applicant) => {
-    if (!isVip) {
-      toast("Cần gói VIP để xem chi tiết nhận xét AI");
-      return;
-    }
+        setApplicants((prev) =>
+            prev.map((app) =>
+                app.id === applicantId ? { ...app, ...updates } : app,
+            ),
+        );
+        toast.success(successMessage);
+    };
 
-    setSelectedApplicant(applicant);
-  };
+    const handleStatusAction = async (applicant: Applicant, nextStatus: AppStatus) => {
+        if (nextStatus === "interviewing") {
+            setScheduleApplicant(applicant);
+            return;
+        }
 
-  const getScoreTone = (score: number) => {
-    if (score >= 80) return "high";
-    if (score >= 60) return "medium";
-    return "low";
-  };
+        try {
+            await apiClient.put(`/application/${applicant.application_id}/status`, {
+                status: nextStatus,
+            });
 
-  const getCount = (status: "all" | AppStatus) => {
-    if (status === "all") return applicants.length;
-    return applicants.filter((app) => app.status === status).length;
-  };
+            updateApplicantState(
+                applicant.id,
+                { status: nextStatus },
+                nextStatus === "hired"
+                    ? "Đã cập nhật ứng viên sang tuyển dụng"
+                    : "Đã cập nhật trạng thái ứng viên",
+            );
+        } catch (error) {
+            toast.error("Không thể cập nhật trạng thái ứng viên");
+        }
+    };
 
-  const filteredApplicants = applicants.filter((app) => {
-    const matchKeyword =
-      app.candidate_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      app.email.toLowerCase().includes(searchQuery.toLowerCase());
+    const handleSaveInterviewSchedule = async (values: InterviewScheduleFormValues) => {
+        if (!scheduleApplicant) return;
 
-    if (activeTab === "all") return matchKeyword;
-    return matchKeyword && app.status === activeTab;
-  });
+        try {
+            const payload = {
+                interview_time: new Date(values.interview_time).toISOString(),
+                meeting_link: values.meeting_link,
+                location: values.location,
+                notes: values.notes,
+            };
 
-  return (
-    <>
-      <div className={styles.pageContainer}>
-        <div className={styles.header}>
-          <div>
-            <h1>Danh sách ứng viên</h1>
-            <p>
-              Theo dõi hồ sơ, điểm AI và mở nhận xét chi tiết trong cửa sổ riêng.
-            </p>
-          </div>
-          {!loadingCompany && !isVip && (
-            <Link href="/hr_manager/pricing" className={styles.upgradeCta}>
-              Nâng cấp VIP
-              <ArrowRight size={16} />
-            </Link>
-          )}
-        </div>
+            if (scheduleApplicant.interview?.id) {
+                await apiClient.put(
+                    `/interview/schedules/${scheduleApplicant.interview.id}`,
+                    payload
+                );
+            } else {
+                await apiClient.post("/interview/schedules", {
+                    ...payload,
+                    application_id: scheduleApplicant.application_id,
+                });
+            }
 
-        <div className={styles.aiGateCard}>
-          <div className={styles.aiGateHeader}>
-            <div className={styles.aiGateIcon}>
-              {isVip ? <Sparkles size={18} /> : <Lock size={18} />}
-            </div>
-            <div>
-              <h3>AI đánh giá ứng viên</h3>
-              <p>
-                {isVip
-                  ? "Bạn đang mở khóa điểm AI và bảng nhận xét chi tiết cho từng ứng viên."
-                  : "Điểm AI và chi tiết nhận xét đang bị khóa. Nâng cấp VIP để mở khóa ngay trong danh sách ứng viên."}
-              </p>
-            </div>
-          </div>
+            updateApplicantState(
+                scheduleApplicant.id,
+                {
+                    status: "interviewing",
+                    interview: {
+                        ...scheduleApplicant.interview,
+                        interview_time: values.interview_time,
+                        meeting_link: values.meeting_link,
+                        location: values.location,
+                        notes: values.notes,
+                        mode: values.mode,
+                    },
+                },
+                "Đã lưu lịch phỏng vấn",
+            );
+            setScheduleApplicant(null);
+        } catch (error) {
+            toast.error("Không thể lưu lịch phỏng vấn");
+        }
+    };
 
-          <div className={styles.aiGateFeatures}>
-            <div className={styles.aiFeature}>
-              <Sparkles size={16} />
-              AI Match Score theo từng CV
-            </div>
-            <div className={styles.aiFeature}>
-              <Eye size={16} />
-              Popup nhận xét điểm mạnh, rủi ro, khuyến nghị
-            </div>
-          </div>
-        </div>
+    const handleSaveInterviewNotes = async (note: string) => {
+        if (!notesApplicant) return;
+        try {
+            const response = await apiClient.put(
+                `/interview/schedules/${notesApplicant.application_id}/note`,
+                { notes: note, }
+            );
+            console.log(response.data);
 
-        <div className={styles.filterSection}>
-          <div className={styles.tabs}>
-            {(
-              ["all", "applied", "interviewing", "hired", "rejected"] as const
-            ).map((status) => (
-              <button
-                key={status}
-                className={cx(styles.tabBtn, {
-                  [styles.active]: activeTab === status,
-                })}
-                onClick={() => setActiveTab(status)}
-              >
-                {status === "all"
-                  ? "Tất cả"
-                  : status === "applied"
-                    ? "Mới nộp"
-                    : status === "interviewing"
-                      ? "Đang phỏng vấn"
-                      : status === "hired"
-                        ? "Đã tuyển"
-                        : "Từ chối"}
-                <span className={styles.count}>{getCount(status)}</span>
-              </button>
-            ))}
-          </div>
+            updateApplicantState(
+                notesApplicant.id,
+                { notes: note },
+                note ? "Đã lưu ghi chú phỏng vấn" : "Đã xóa ghi chú phỏng vấn",
+            );
 
-          <div className={styles.toolbar}>
-            <div className={styles.searchBox}>
-              <Search size={18} />
-              <input
-                type="text"
-                placeholder="Tìm theo tên hoặc email..."
-                value={searchQuery}
-                onChange={(event) => setSearchQuery(event.target.value)}
-              />
-            </div>
-          </div>
+        } catch (error) {
+            toast.error("Không thể lưu ghi chú phỏng vấn")
+        }
 
-          <div className={styles.tableWrapper}>
-            <table>
-              <thead>
-                <tr>
-                  <th style={{ width: "40px" }}>
-                    <CheckSquare size={16} color="#94a3b8" />
-                  </th>
-                  <th>Ứng viên</th>
-                  <th>Ngày nộp</th>
-                  <th>
-                    <div className={styles.aiHeading}>
-                      AI Match <Sparkles size={14} color="#14b8a6" />
+        setNotesApplicant(null);
+    };
+
+    const handlePreviewCV = async (applicationId: number | null) => {
+        try {
+            await previewFileFromServer(`/application/hr/${applicationId}/cv/view`);
+        } catch {
+            toast.error("Không thể mở file CV lúc này");
+        }
+    };
+
+    return (
+        <>
+            <div className={styles.pageContainer}>
+                <div className={styles.header}>
+                    <div>
+                        <h1>Ứng viên theo từng job</h1>
+                        <p>
+                            Chọn một job ở cột bên trái để xem đúng danh sách ứng viên đã ứng
+                            tuyển vào job đó.
+                        </p>
                     </div>
-                  </th>
-                  <th>Chi tiết nhận xét</th>
-                  <th>Trạng thái</th>
-                  <th style={{ textAlign: "right" }}>Hành động</th>
-                </tr>
-              </thead>
-              <tbody>
-                {loading || loadingCompany ? (
-                  <tr>
-                    <td colSpan={7} style={{ textAlign: "center", padding: "2rem" }}>
-                      Đang tải...
-                    </td>
-                  </tr>
-                ) : filteredApplicants.length === 0 ? (
-                  <tr>
-                    <td colSpan={7} style={{ textAlign: "center", padding: "2rem" }}>
-                      Không có ứng viên nào.
-                    </td>
-                  </tr>
-                ) : (
-                  filteredApplicants.map((app) => (
-                    <tr key={app.id}>
-                      <td>
-                        <input type="checkbox" />
-                      </td>
-                      <td>
-                        <div className={styles.candidateInfo}>
-                          <div className={styles.avatar}>
-                            {app.candidate_name.charAt(0)}
-                          </div>
-                          <div>
-                            <div className={styles.name}>{app.candidate_name}</div>
-                            <div className={styles.email}>{app.email}</div>
-                          </div>
+                    {!loadingCompany && !isVip && (
+                        <Link href="/hr_manager/pricing" className={styles.upgradeCta}>
+                            Nâng cấp VIP
+                            <ArrowRight size={16} />
+                        </Link>
+                    )}
+                </div>
+
+                <div className={styles.aiGateCard}>
+                    <div className={styles.aiGateHeader}>
+                        <div className={styles.aiGateIcon}>
+                            {isVip ? <Sparkles size={18} /> : <Lock size={18} />}
                         </div>
-                      </td>
-                      <td>{new Date(app.applied_at).toLocaleDateString("vi-VN")}</td>
-                      <td>
-                        {isVip ? (
-                          <div
-                            className={cx(
-                              styles.aiScore,
-                              styles[getScoreTone(app.ai_score)],
+                        <div>
+                            <h3>AI đánh giá ứng viên</h3>
+                            <p>
+                                {isVip
+                                    ? "Bạn đang mở khóa điểm AI và bảng nhận xét chi tiết cho từng ứng viên."
+                                    : "Điểm AI và chi tiết nhận xét đang bị khóa. Nâng cấp VIP để mở khóa ngay trong danh sách ứng viên."}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className={styles.aiGateFeatures}>
+                        <div className={styles.aiFeature}>
+                            <Sparkles size={16} />
+                            AI Match Score theo từng CV
+                        </div>
+                        <div className={styles.aiFeature}>
+                            <Eye size={16} />
+                            Popup nhận xét điểm mạnh, rủi ro, khuyến nghị
+                        </div>
+                    </div>
+                </div>
+
+                <div className={styles.workspace}>
+                    <JobSidebar
+                        jobs={jobs}
+                        jobsLoading={jobsLoading}
+                        selectedJobId={selectedJobId}
+                        onSelectJob={handleSelectJob}
+                    // onRefresh={() => window.location.reload()}
+                    />
+
+                    <section className={styles.applicantsPanel}>
+                        <div className={styles.selectedJobHero}>
+                            {selectedJob ? (
+                                <>
+                                    <div>
+                                        <span className={styles.panelEyebrow}>Job đang chọn</span>
+                                        <h2>{selectedJob.title}</h2>
+                                        <div className={styles.heroMeta}>
+                                            <span>
+                                                <BriefcaseBusiness size={14} />
+                                                {formatJobStatus(selectedJob.status)}
+                                            </span>
+                                            <span>
+                                                <Users size={14} />
+                                                {counts.all} ứng viên
+                                            </span>
+                                            <span>
+                                                <CalendarDays size={14} />
+                                                {selectedJob.location}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <Link href="/hr_manager/jobs">
+                                        <Button variant="outline">Về danh sách job</Button>
+                                    </Link>
+                                </>
+                            ) : (
+                                <div className={styles.emptyHero}>
+                                    Chọn một job để bắt đầu xem ứng viên.
+                                </div>
                             )}
-                          >
-                            {app.ai_score}
-                          </div>
-                        ) : (
-                          <Link
-                            href="/hr_manager/pricing"
-                            className={styles.lockedAi}
-                            title="Nâng cấp VIP để xem điểm"
-                          >
-                            <Lock size={14} />
-                            VIP
-                          </Link>
-                        )}
-                      </td>
-                      <td>
-                        {isVip ? (
-                          <button
-                            className={styles.reviewBtn}
-                            onClick={() => openAiReview(app)}
-                          >
-                            <Eye size={14} />
-                            Xem nhận xét AI
-                          </button>
-                        ) : (
-                          <Link
-                            href="/hr_manager/pricing"
-                            className={styles.lockedRemark}
-                          >
-                            <Lock size={14} />
-                            Mở khóa nhận xét AI
-                          </Link>
-                        )}
-                      </td>
-                      <td>
-                        <span
-                          className={cx(styles.statusBadge, styles[app.status])}
-                        >
-                          {app.status === "applied"
-                            ? "Chờ duyệt"
-                            : app.status === "interviewing"
-                              ? "Phỏng vấn"
-                              : app.status === "hired"
-                                ? "Đã nhận"
-                                : "Từ chối"}
-                        </span>
-                      </td>
-                      <td style={{ textAlign: "right" }}>
-                        <div className={styles.actionGroup}>
-                          <select
-                            className={styles.actionSelect}
-                            value={app.status}
-                            onChange={(event) =>
-                              handleStatusUpdate(
-                                app.id,
-                                event.target.value as AppStatus,
-                              )
-                            }
-                          >
-                            <option value="applied">Chờ duyệt</option>
-                            <option value="interviewing">Phỏng vấn</option>
-                            <option value="hired">Tuyển dụng</option>
-                            <option value="rejected">Từ chối</option>
-                          </select>
-
-                          <Button
-                            variant="ghost"
-                            style={{ padding: "0.375rem 0.6rem" }}
-                            title={
-                              isVip ? "Xem nhận xét AI" : "Tính năng dành cho VIP"
-                            }
-                            onClick={() => openAiReview(app)}
-                          >
-                            {isVip ? <Eye size={18} /> : <Lock size={18} />}
-                          </Button>
                         </div>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-        <Toaster />
-      </div>
 
-      {selectedApplicant && (
-        <div
-          className={styles.modalOverlay}
-          onClick={() => setSelectedApplicant(null)}
-        >
-          <div
-            className={styles.modalCard}
-            onClick={(event) => event.stopPropagation()}
-          >
-            <div className={styles.modalHeader}>
-              <div>
-                <h3>Nhận xét AI chi tiết</h3>
-                <p>
-                  {selectedApplicant.candidate_name} • {selectedApplicant.email}
-                </p>
-              </div>
-              <button
-                className={styles.closeBtn}
-                onClick={() => setSelectedApplicant(null)}
-              >
-                <X size={18} />
-              </button>
+                        <div className={styles.summaryGrid}>
+                            <div className={styles.summaryCard}>
+                                <span>Tổng ứng viên</span>
+                                <strong>{counts.all}</strong>
+                            </div>
+                            <div className={styles.summaryCard}>
+                                <span>Mới nộp</span>
+                                <strong>{counts.applied}</strong>
+                            </div>
+                            <div className={styles.summaryCard}>
+                                <span>Phỏng vấn</span>
+                                <strong>{counts.interviewing}</strong>
+                            </div>
+                            <div className={styles.summaryCard}>
+                                <span>Đã nhận</span>
+                                <strong>{counts.hired}</strong>
+                            </div>
+                        </div>
+
+                        <div className={styles.filterSection}>
+                            <div className={styles.tabs}>
+                                {TAB_ORDER.map((tab) => (
+                                    <button
+                                        key={tab}
+                                        className={cx(styles.tabBtn, {
+                                            [styles.active]: activeTab === tab,
+                                        })}
+                                        onClick={() => setActiveTab(tab)}
+                                        disabled={!selectedJob}
+                                    >
+                                        {getTabLabel(tab)}
+                                        <span className={styles.count}>
+                                            {tab === "all" ? counts.all : counts[tab]}
+                                        </span>
+                                    </button>
+                                ))}
+                            </div>
+
+                            <div className={styles.toolbar}>
+                                <div className={styles.searchBox}>
+                                    <Search size={18} />
+                                    <input
+                                        type="text"
+                                        placeholder="Tìm theo tên, email hoặc tên CV..."
+                                        value={searchQuery}
+                                        onChange={(event) => setSearchQuery(event.target.value)}
+                                        disabled={!selectedJob}
+                                    />
+                                </div>
+                            </div>
+
+                            <ApplicantsTable
+                                applicants={filteredApplicants}
+                                jobsLoading={jobsLoading}
+                                applicantsLoading={applicantsLoading}
+                                loadingCompany={loadingCompany}
+                                activeTab={activeTab}
+                                hasSelectedJob={Boolean(selectedJob)}
+                                isVip={isVip}
+                                onPreviewCv={handlePreviewCV}
+                                onOpenAiReview={openAiReview}
+                                onSelectAction={handleStatusAction}
+                                onOpenNotes={setNotesApplicant}
+                            />
+                        </div>
+                    </section>
+                </div>
+                <Toaster />
             </div>
 
-            <div className={styles.modalScoreRow}>
-              <div
-                className={cx(
-                  styles.modalScoreBadge,
-                  styles[getScoreTone(selectedApplicant.ai_score)],
-                )}
-              >
-                {selectedApplicant.ai_score}
-              </div>
-              <div className={styles.modalSummary}>
-                <h4>Tóm tắt</h4>
-                <p>{selectedApplicant.ai_summary}</p>
-              </div>
-            </div>
+            <AiReviewModal
+                applicant={selectedApplicant}
+                onClose={() => setSelectedApplicant(null)}
+                onPreviewCv={handlePreviewCV}
+            />
 
-            <div className={styles.modalSection}>
-              <div className={styles.modalSectionTitle}>
-                <BadgeCheck size={16} />
-                Điểm mạnh nổi bật
-              </div>
-              <ul className={styles.modalList}>
-                {selectedApplicant.ai_strengths.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
-            </div>
+            <InterviewScheduleModal
+                key={scheduleApplicant?.id ?? "schedule-modal"}
+                applicant={scheduleApplicant}
+                onClose={() => setScheduleApplicant(null)}
+                onSave={handleSaveInterviewSchedule}
+            />
 
-            <div className={styles.modalSection}>
-              <div className={styles.modalSectionTitle}>
-                <TriangleAlert size={16} />
-                Rủi ro cần xác minh
-              </div>
-              <ul className={styles.modalList}>
-                {selectedApplicant.ai_risks.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
-            </div>
-
-            <div className={styles.modalSection}>
-              <div className={styles.modalSectionTitle}>
-                <CircleAlert size={16} />
-                Khuyến nghị của AI
-              </div>
-              <p className={styles.recommendationText}>
-                {selectedApplicant.recommendation}
-              </p>
-            </div>
-
-            <div className={styles.modalFooter}>
-              <Button variant="outline" onClick={() => setSelectedApplicant(null)}>
-                Đóng
-              </Button>
-              <Button
-                variant="primary"
-                onClick={() => {
-                  toast.success(
-                    `Đã đánh dấu ${selectedApplicant.candidate_name} để ưu tiên xem xét`,
-                  );
-                  setSelectedApplicant(null);
-                }}
-              >
-                Đánh dấu ưu tiên
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
-  );
+            <InterviewNotesModal
+                key={notesApplicant?.id ?? "notes-modal"}
+                applicant={notesApplicant}
+                onClose={() => setNotesApplicant(null)}
+                onSave={handleSaveInterviewNotes}
+            />
+        </>
+    );
 }

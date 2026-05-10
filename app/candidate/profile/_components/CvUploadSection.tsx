@@ -1,22 +1,16 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import {
-  FileText,
-  Plus,
-  Eye,
-  Trash2,
-  CheckCircle,
-  X,
-  Loader2,
-} from "lucide-react";
+import { FileText, Plus, Eye, Trash2, X } from "lucide-react";
 import cx from "classnames";
+import toast, { Toaster } from "react-hot-toast";
+
 import styles from "./CvUploadSection.module.scss";
 import Button from "@/components/ui/Button";
 import apiClient from "@/lib/apiClient";
-import toast, { Toaster } from "react-hot-toast";
 import { previewFileFromServer } from "@/utils/fileUtils";
 import ConfirmModal from "@/components/ui/ConfirmModal";
+
 interface UploadedCV {
   id: string;
   file_name: string;
@@ -40,7 +34,6 @@ export default function CvUploadSection() {
     id: null,
   });
 
-  // 1. Lấy danh sách CV từ API
   const fetchCVs = async () => {
     try {
       const res = await apiClient.get("/profiles/cv_upload");
@@ -54,7 +47,6 @@ export default function CvUploadSection() {
     fetchCVs();
   }, []);
 
-  // 2. Xử lý khi chọn file từ máy
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -70,7 +62,6 @@ export default function CvUploadSection() {
     }
   };
 
-  // 3. Upload file lên server
   const handleUpload = async () => {
     if (!selectedFile) return;
     setIsUploading(true);
@@ -84,41 +75,40 @@ export default function CvUploadSection() {
         fetchCVs();
         toast.success("Đã thêm CV thành công");
       }
-    } catch (error) {
+    } catch {
       toast.error("Lỗi upload file");
     } finally {
       setIsUploading(false);
     }
   };
 
-  // 4. Các thao tác trên danh sách
   const handlePreview = async (cvId: string) => {
     try {
-      await previewFileFromServer(cvId);
-    } catch (error) {
+      await previewFileFromServer(`/profiles/cv_upload/${cvId}/view`);
+    } catch {
       toast.error(
         "Phiên đăng nhập đã hết hạn hoặc bạn không có quyền xem file này.",
       );
     }
   };
 
-  // Hàm này gắn vào thẻ onClick của nút Thùng Rác UI
   const openDeleteConfirm = (id: string) => {
-    setConfirmModal({ isOpen: true, id: id });
+    setConfirmModal({ isOpen: true, id });
   };
+
   const executeDelete = async () => {
     if (!confirmModal.id) return;
 
-    setIsDeleting(true); // Bật loading của Modal
+    setIsDeleting(true);
     try {
       await apiClient.delete(`/profiles/cv_upload/${confirmModal.id}`);
       setCvList((prev) => prev.filter((cv) => cv.id !== confirmModal.id));
       toast.success("Đã xóa CV thành công");
-    } catch (error) {
+    } catch {
       toast.error("Lỗi khi xóa");
     } finally {
       setIsDeleting(false);
-      setConfirmModal({ isOpen: false, id: null }); // Đóng modal và reset ID
+      setConfirmModal({ isOpen: false, id: null });
     }
   };
 
@@ -130,7 +120,6 @@ export default function CvUploadSection() {
           <p>Tải lên và quản lý các bản hồ sơ dùng để ứng tuyển.</p>
         </div>
 
-        {/* Nút Thêm CV (Mở hộp thoại chọn file) */}
         {!selectedFile && (
           <div className={styles.wrapBtnUpCv}>
             <Button
@@ -150,7 +139,6 @@ export default function CvUploadSection() {
         />
       </div>
 
-      {/* Hiển thị file vừa chọn - chờ nhấn Lưu */}
       {selectedFile && (
         <div className={styles.pendingFile}>
           <div className={styles.fileInfo}>
@@ -176,7 +164,6 @@ export default function CvUploadSection() {
         </div>
       )}
 
-      {/* Danh sách CV đã tải lên */}
       <div className={styles.cvList}>
         {cvList.length === 0 ? (
           <p style={{ textAlign: "center", color: "#94a3b8", padding: "2rem" }}>
@@ -193,14 +180,12 @@ export default function CvUploadSection() {
                 <div className={styles.text}>
                   <div className={styles.name}>{cv.file_name}</div>
                   <div className={styles.date}>
-                    Ngày tải:{" "}
-                    {new Date(cv.created_at).toLocaleDateString("vi-VN")}
+                    Ngày tải: {new Date(cv.created_at).toLocaleDateString("vi-VN")}
                   </div>
                 </div>
               </div>
 
               <div className={styles.itemActions}>
-                {/* Nút Xem Preview (Mở tab mới) */}
                 <Button
                   variant="ghost"
                   onClick={() => handlePreview(cv.id)}

@@ -1,24 +1,23 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Plus, Trash2, Award, Pencil } from "lucide-react";
+import { Toaster } from "react-hot-toast";
+
 import styles from "./StylesAll.module.scss";
 import InputField from "@/components/ui/InputField";
 import Button from "@/components/ui/Button";
 import { useProfileSection } from "@/hooks/useProfileSection";
-import { Toaster } from "react-hot-toast";
 
-// 1. Interface DB
 interface Certification {
   id: string;
   name: string;
   issuer: string | null;
 }
 
-// 2. Zod Schema
 const certSchema = z.object({
   name: z.string().min(2, "Vui lòng nhập tên chứng chỉ"),
   issuer: z.string().optional(),
@@ -30,7 +29,6 @@ export default function CertificationSection() {
   const {
     items: certifications,
     isAdding,
-    editingId,
     handleSave,
     handleDelete,
     openAddForm,
@@ -58,13 +56,14 @@ export default function CertificationSection() {
     }
   };
 
-  const handleEdit = async (certifications: Certification) => {
-    openEditForm(certifications.id);
+  const handleEdit = async (certification: Certification) => {
+    openEditForm(certification.id);
     reset({
-      name: certifications.name,
-      issuer: certifications.issuer || "",
+      name: certification.name,
+      issuer: certification.issuer || "",
     });
   };
+
   return (
     <div className={styles.sectionCard}>
       <div className={styles.sectionHeader}>
@@ -74,11 +73,11 @@ export default function CertificationSection() {
             <Button
               variant="ghost"
               onClick={() => {
-                (openAddForm(),
-                  reset({
-                    name: "",
-                    issuer: "",
-                  }));
+                openAddForm();
+                reset({
+                  name: "",
+                  issuer: "",
+                });
               }}
             >
               <Plus size={18} /> Thêm

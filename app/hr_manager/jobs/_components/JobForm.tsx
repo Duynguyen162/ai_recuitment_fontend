@@ -54,7 +54,9 @@ function normalizeDateTimeLocal(value?: string) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "";
 
-  const localTime = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+  const localTime = new Date(
+    date.getTime() - date.getTimezoneOffset() * 60000,
+  );
   return localTime.toISOString().slice(0, 16);
 }
 
@@ -96,17 +98,19 @@ export default function JobForm({ mode, initialValues, jobId }: JobFormProps) {
   ) => {
     const payload = {
       ...values,
-      status: intent === "publish" ? "published" : "draft",
       expired_at: new Date(values.expired_at).toISOString(),
     };
 
     if (mode === "create") {
       try {
-        await apiClient.post("/job/create_jobs", payload);
+        await apiClient.post("/job/create_jobs", {
+          ...payload,
+          status: intent === "publish" ? "published" : "draft",
+        });
         toast.success(
           intent === "publish"
-            ? "Đã gửi tạo job để đăng"
-            : "Đã tạo job mới thành công",
+            ? "Đã tạo và đăng job thành công"
+            : "Đã tạo job nháp thành công",
         );
         router.push("/hr_manager/jobs");
         router.refresh();
@@ -118,15 +122,29 @@ export default function JobForm({ mode, initialValues, jobId }: JobFormProps) {
 
     try {
       await apiClient.put(`/job/update_job/${jobId}`, payload);
-      toast.success("Cập nhật thành công");
-    } catch (error) {
-        toast.error("Lỗi cập nhật")
+
+      if (intent === "publish") {
+        await apiClient.put(`/job/${jobId}/status?status=published`);
+      }
+
+      toast.success(
+        intent === "publish"
+          ? "Đã cập nhật và đăng job thành công"
+          : "Đã lưu thay đổi bản nháp",
+      );
+      router.push("/hr_manager/jobs");
+      router.refresh();
+    } catch {
+      toast.error(
+        intent === "publish"
+          ? "Không thể đăng job sau khi cập nhật"
+          : "Lỗi cập nhật job",
+      );
     }
   };
 
   return (
     <form className={styles.formLayout}>
-      {/* ── HERO CARD: Back + Title + Status ── */}
       <div className={styles.heroCard}>
         <div className={styles.heroTop}>
           <button
@@ -157,11 +175,8 @@ export default function JobForm({ mode, initialValues, jobId }: JobFormProps) {
         </div>
       </div>
 
-      {/* ── TWO-COLUMN: Main form + Sticky sidebar ── */}
       <div className={styles.contentWithSidebar}>
-        {/* ── LEFT: Form sections ── */}
         <div className={styles.formMain}>
-          {/* Section 1: Basic info */}
           <section className={styles.card}>
             <div className={styles.sectionHeader}>
               <div className={styles.sectionTitle}>Thông tin cơ bản</div>
@@ -218,7 +233,6 @@ export default function JobForm({ mode, initialValues, jobId }: JobFormProps) {
             />
           </section>
 
-          {/* Section 2: Conditions & deadline */}
           <section className={styles.card}>
             <div className={styles.sectionHeader}>
               <div className={styles.sectionTitle}>Điều kiện và thời hạn</div>
@@ -275,7 +289,6 @@ export default function JobForm({ mode, initialValues, jobId }: JobFormProps) {
             </div>
           </section>
 
-          {/* ── INLINE ACTION BUTTONS (end of form) ── */}
           <div className={styles.inlineActions}>
             <p className={styles.inlineActionsHint}>
               Kiểm tra lại thông tin trước khi lưu hoặc chuẩn bị đăng.
@@ -284,16 +297,21 @@ export default function JobForm({ mode, initialValues, jobId }: JobFormProps) {
               <Button
                 type="button"
                 loading={isSubmitting}
-                onClick={handleSubmit((data) => onSubmit(data, "publish"))}
+                onClick={() => {
+                  setSubmitIntent("publish");
+                  void handleSubmit((data) => onSubmit(data, "publish"))();
+                }}
               >
                 Đăng bài
-                {/* {mode === "create" ? "Đăng bài" : "Đăng bài"} */}
               </Button>
               <Button
                 type="button"
                 variant="outline"
                 loading={isSubmitting}
-                onClick={handleSubmit((data) => onSubmit(data, "draft"))}
+                onClick={() => {
+                  setSubmitIntent("draft");
+                  void handleSubmit((data) => onSubmit(data, "draft"))();
+                }}
               >
                 {mode === "create" ? "Lưu bản nháp" : "Lưu thay đổi"}
               </Button>
@@ -301,9 +319,7 @@ export default function JobForm({ mode, initialValues, jobId }: JobFormProps) {
           </div>
         </div>
 
-        {/* ── RIGHT: Sticky sidebar ── */}
         <aside className={styles.sidebar}>
-          {/* Hints card — visible from the start */}
           <div className={styles.card}>
             <div className={styles.sideHeading}>Hướng dẫn nhập liệu</div>
             <div className={styles.hintList}>
@@ -322,7 +338,6 @@ export default function JobForm({ mode, initialValues, jobId }: JobFormProps) {
             </div>
           </div>
 
-          {/* Status summary card */}
           <div className={styles.card}>
             <div className={styles.sideHeading}>Thao tác hiện tại</div>
             <div className={styles.summaryList}>

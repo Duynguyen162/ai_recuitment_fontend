@@ -1,8 +1,9 @@
 .sectionCard {
   background-color: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 0.75rem;
+  border: 1px solid #dbeafe;
+  border-radius: 1rem;
   margin-bottom: 1.5rem;
+  box-shadow: 0 12px 30px rgba(37, 99, 235, 0.06);
 }
 
 /* HEADER */
@@ -10,13 +11,14 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid #dbeafe;
   padding: 1rem 1.5rem;
+  background: linear-gradient(180deg, #eff6ff 0%, #ffffff 100%);
 
   h2 {
     font-size: 1.125rem;
     font-weight: 700;
-    color: #111827;
+    color: #1e3a8a;
   }
 }
 
@@ -28,12 +30,12 @@
 /* FORM */
 .formWrapper {
   padding: 1.5rem;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid #dbeafe;
 
   h3 {
     font-size: 1rem;
     font-weight: 700;
-    color: #1e293b;
+    color: #1e3a8a;
     margin-bottom: 1rem;
   }
 }
@@ -67,7 +69,8 @@
   cursor: pointer;
 
   &:hover {
-    background-color: #f3f4f6;
+    background-color: #eff6ff;
+    border-color: #bfdbfe;
   }
 }
 
@@ -101,7 +104,7 @@
   justify-content: space-between;
   gap: 1rem;
   padding: 1rem 0;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid #e0ecff;
 
   &:last-child {
     border-bottom: none;
@@ -121,7 +124,7 @@
 
 .subText {
   font-size: 0.875rem;
-  color: #6b7280;
+  color: #2563eb;
   margin-bottom: 0.25rem;
 }
 
@@ -156,6 +159,6 @@
   cursor: pointer;
   color: #9ca3af;
   &:hover {
-    color: #0018ec;
+    color: #2563eb;
   }
 }
