@@ -1,19 +1,17 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import React, { useEffect } from "react";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { boolean, z } from "zod";
-import cx from "classnames";
-import styles from "./BasicInfoForm.module.scss";
-import InputField from "@/components/ui/InputField";
-import SkillTagInput from "@/components/ui/SkillTagInput"; // Component tag bạn đã có
-import axios from "axios";
-import apiClient from "@/lib/apiClient";
-import TextareaField from "@/components/ui/TextareaField";
+import { z } from "zod";
 import toast, { Toaster } from "react-hot-toast";
 
-// 1. Zod Schema & Interface
+import styles from "./BasicInfoForm.module.scss";
+import InputField from "@/components/ui/InputField";
+import SkillTagInput from "@/components/ui/SkillTagInput";
+import apiClient from "@/lib/apiClient";
+import TextareaField from "@/components/ui/TextareaField";
+
 const basicInfoSchema = z.object({
   full_name: z.string().min(2, "Vui lòng nhập họ và tên"),
   phone: z
@@ -30,8 +28,16 @@ const basicInfoSchema = z.object({
     .url("URL không hợp lệ")
     .optional()
     .or(z.literal("")),
-  linkedin_url: z.string().url("URL không hợp lệ").optional().or(z.literal("")),
-  github_url: z.string().url("URL không hợp lệ").optional().or(z.literal("")),
+  linkedin_url: z
+    .string()
+    .url("URL không hợp lệ")
+    .optional()
+    .or(z.literal("")),
+  github_url: z
+    .string()
+    .url("URL không hợp lệ")
+    .optional()
+    .or(z.literal("")),
   skill_tags: z.array(z.string()).default([]),
 });
 
@@ -41,9 +47,9 @@ export default function BasicInfoForm() {
   const {
     register,
     handleSubmit,
-    watch,
     setValue,
     reset,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<BasicInfoFormValues>({
     resolver: zodResolver(basicInfoSchema),
@@ -58,7 +64,7 @@ export default function BasicInfoForm() {
       skill_tags: [],
     },
   });
-  //load dữ liệu từ db
+
   useEffect(() => {
     const profileData = async () => {
       try {
@@ -78,10 +84,15 @@ export default function BasicInfoForm() {
         console.log(error);
       }
     };
+
     profileData();
   }, [reset]);
 
-  const skill = watch("skill_tags");
+  const skill = useWatch({
+    control,
+    name: "skill_tags",
+    defaultValue: [],
+  });
 
   const onSubmit = async (data: BasicInfoFormValues) => {
     try {
@@ -134,7 +145,6 @@ export default function BasicInfoForm() {
           />
         </div>
 
-        {/* Khu vực nhập Skill Tags dùng Component riêng */}
         <div style={{ marginTop: "1.5rem" }}>
           <SkillTagInput
             tags={skill}
@@ -145,7 +155,6 @@ export default function BasicInfoForm() {
           />
         </div>
 
-        {/* Textarea chưa làm component riêng nên ta dùng class CSS tái sử dụng */}
         <TextareaField
           label="Giới thiệu bản thân (Bio)"
           placeholder="Mô tả ngắn về bản thân, mục tiêu nghề nghiệp..."
