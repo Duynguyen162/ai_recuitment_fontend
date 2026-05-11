@@ -29,7 +29,6 @@ export default function TopHeader({
     router.push("/auth/login");
   };
 
-  // 👇 click ngoài để đóng menu
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -48,13 +47,10 @@ export default function TopHeader({
       <div className={styles.leftSection}></div>
 
       <div className={styles.rightSection}>
-        {/* 🔔 Notification */}
         <button className={styles.notificationBtn}>
           <Bell size={20} />
           <span className={styles.badge}>3</span>
         </button>
-
-        {/* 👤 User */}
         <div className={styles.userWrapper} ref={dropdownRef}>
           <div
             className={styles.userProfile}
@@ -76,8 +72,6 @@ export default function TopHeader({
             </div>
             <ChevronDown size={16} />
           </div>
-
-          {/* 👇 Dropdown */}
           {open && (
             <div className={styles.dropdown}>
               <button

@@ -1,0 +1,229 @@
+/* CSS Module cho JobDetailPopup */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  padding: 1rem;
+}
+
+.modal {
+  background: #fff;
+  border-radius: 1rem;
+  width: min(760px, 96vw);
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 24px 64px rgba(15, 23, 42, 0.22);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Header ── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #f1f5f9;
+  flex-shrink: 0;
+}
+
+.headerTitle {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #0f172a;
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  padding: 0.2rem;
+  border-radius: 0.25rem;
+
+  &:hover {
+    background: #f1f5f9;
+  }
+}
+
+/* ── Body ── */
+.body {
+  padding: 1.25rem;
+  flex: 1;
+}
+
+/* Job header row */
+.jobHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.jobInfo {
+  flex: 1;
+}
+
+.companyName {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin-bottom: 0.2rem;
+}
+
+.jobTitle {
+  font-weight: 700;
+  font-size: 1rem;
+  color: #0f172a;
+}
+
+.badges {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.3rem;
+}
+
+.lockedBadge {
+  font-size: 0.65rem !important;
+}
+
+/* Meta row */
+.metaRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-size: 0.8rem;
+  color: #475569;
+  margin-bottom: 0.75rem;
+}
+
+.metaItem {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.salary {
+  color: #16a34a;
+  font-weight: 600;
+}
+
+/* Tags */
+.tagsRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  background: #eff6ff;
+  color: #1d4ed8;
+  border-radius: 999px;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  border: 1px solid #dbeafe;
+}
+
+/* Content tabs */
+.contentTabs {
+  display: flex;
+  border-bottom: 1px solid #e2e8f0;
+  margin-bottom: 1rem;
+}
+
+.contentTabBtn {
+  padding: 0.6rem 1rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &.active {
+    color: #dc2626;
+    border-bottom-color: #dc2626;
+  }
+}
+
+.tabContent {
+  font-size: 0.875rem;
+  color: #334155;
+  line-height: 1.75;
+  overflow-y: auto;
+  word-break: break-word;
+  overflow-wrap: break-word;
+
+  /* Đảm bảo HTML từ rich-text editor xuống dòng đúng */
+  p, li {
+    margin-bottom: 0.4rem;
+  }
+}
+
+.tabContentInner {
+  white-space: pre-wrap;
+}
+
+/* ── Footer / Actions ── */
+.footer {
+  border-top: 1px solid #f1f5f9;
+  padding: 1rem 1.25rem;
+  background: #f8fafc;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.actionSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.actionSectionTitle {
+  font-size: 0.72rem;
+  color: #64748b;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.autoResolveHint {
+  color: #d97706;
+  font-weight: 500;
+  text-transform: none;
+  margin-left: 0.4rem;
+}
+
+.actionBtns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.actionHint {
+  font-size: 0.7rem;
+  color: #94a3b8;
+  margin: 0;
+}
+
+.divider {
+  border: none;
+  border-top: 1px solid #e2e8f0;
+  margin: 0;
+}

@@ -11,6 +11,7 @@ import {
   LogOut,
   Menu,
   Shield,
+  Users,
 } from "lucide-react";
 import cx from "classnames";
 import { useLogout } from "@/hooks/useLogout";
@@ -25,6 +26,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { name: "Dashboard", path: "/admin/dashboard", icon: LayoutDashboard },
     { name: "Công ty", path: "/admin/companies", icon: Building2 },
     { name: "Kiểm duyệt Job", path: "/admin/jobs", icon: Briefcase },
+    { name: "Ứng viên", path: "/admin/candidates", icon: Users },
     { name: "AI Monitoring", path: "/admin/ai-monitoring", icon: Bot },
   ];
 

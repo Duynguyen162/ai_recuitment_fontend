@@ -175,3 +175,84 @@
     transform: scale(0.95);
   }
 }
+
+/* Tablet: Auto collapse */
+@media (max-width: 1024px) {
+  .sidebar {
+    width: 80px;
+  }
+  .logo {
+    justify-content: center;
+    padding: 0;
+    span { display: none; }
+  }
+  .groupTitle { display: none; }
+  .label {
+    opacity: 0;
+    width: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .menuItem {
+    justify-content: center;
+  }
+  .footer { display: none; } /* Hide toggle on tablet since it's forced collapsed */
+}
+
+/* Mobile: Bottom Navigation */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100% !important;
+    height: 60px;
+    top: auto;
+    bottom: 0;
+    flex-direction: row;
+    border-right: none;
+    border-top: 1px solid #e5e7eb;
+    z-index: 1000;
+  }
+
+  .logo, .groupTitle, .label, .footer {
+    display: none !important;
+  }
+
+  .navMenu {
+    padding: 0;
+    flex-direction: row;
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+  
+  .navMenu::-webkit-scrollbar {
+    display: none; /* Hide scrollbar for bottom nav */
+  }
+
+  .menuGroup {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-around;
+    align-items: center;
+  }
+
+  .menuItem {
+    margin: 0;
+    padding: 12px;
+    flex: 1;
+    justify-content: center;
+    border-radius: 0;
+    
+    svg {
+      min-width: 24px;
+      width: 24px;
+      height: 24px;
+    }
+
+    &:hover, &.active {
+      background-color: transparent;
+      border-top: 3px solid #1e40af;
+      padding-top: 9px;
+    }
+  }
+}

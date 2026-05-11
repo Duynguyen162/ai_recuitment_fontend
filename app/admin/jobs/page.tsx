@@ -2,213 +2,151 @@
 
 import React, { useEffect, useState, useCallback } from "react";
 import cx from "classnames";
-import { CheckCircle, EyeOff, Trash2, Eye, CheckSquare, XSquare } from "lucide-react";
 import styles from "../AdminLayout.module.scss";
 import apiClient from "@/lib/apiClient";
 import toast, { Toaster } from "react-hot-toast";
-import Link from "next/link";
-
-interface FlaggedJob {
-  id: number;
-  title: string;
-  company_name: string;
-  status: string;
-  ai_flag_reason?: string;
-  created_at: string;
-}
-
-interface JobReport {
-  id: number;
-  job_id: number;
-  job_title: string;
-  company_name: string;
-  reporter_email: string;
-  reason: string;
-  status: "pending" | "resolved" | "dismissed";
-  created_at: string;
-}
-
-type Tab = "flagged" | "reports";
+import {
+  JobReport, AdminAction, PAGE_SIZE,
+  STATUS_TABS, ACTION_TABS,
+} from "./_components/types";
+import ReportsTable from "./_components/ReportsTable";
+import JobDetailPopup from "./_components/JobDetailPopup";
 
 export default function AdminJobsPage() {
-  const [tab, setTab] = useState<Tab>("flagged");
-  const [flaggedJobs, setFlaggedJobs] = useState<FlaggedJob[]>([]);
   const [reports, setReports] = useState<JobReport[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
-  const PAGE_SIZE = 15;
+  const [statusFilter, setStatusFilter] = useState<"" | "pending" | "resolved" | "dismissed">("");
+  const [actionFilter, setActionFilter] = useState<"" | AdminAction>("");
+  const [selectedReport, setSelectedReport] = useState<JobReport | null>(null);
 
-  const fetchFlagged = useCallback(async () => {
-    setLoading(true);
-    try {
-      const res = await apiClient.get("/admin/jobs/flagged", { params: { page, page_size: PAGE_SIZE } });
-      if (res.data?.success) setFlaggedJobs(res.data.data ?? []);
-    } catch { toast.error("Không thể tải danh sách job bị flag."); }
-    finally { setLoading(false); }
-  }, [page]);
-
+  /* ── Fetch ── */
   const fetchReports = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await apiClient.get("/admin/job-reports", { params: { page, page_size: PAGE_SIZE } });
+      const res = await apiClient.get("/admin/job-reports", {
+        params: {
+          page,
+          page_size: PAGE_SIZE,
+          status: statusFilter || undefined,
+          // Lọc admin_action — chỉ có ý nghĩa khi status=resolved
+          admin_action: (statusFilter === "resolved" && actionFilter) ? actionFilter : undefined,
+        },
+      });
       if (res.data?.success) setReports(res.data.data ?? []);
-    } catch { toast.error("Không thể tải báo cáo."); }
-    finally { setLoading(false); }
-  }, [page]);
+    } catch {
+      toast.error("Không thể tải báo cáo.");
+    } finally {
+      setLoading(false);
+    }
+  }, [page, statusFilter, actionFilter]);
 
-  useEffect(() => {
-    setPage(1);
-    if (tab === "flagged") fetchFlagged();
-    else fetchReports();
-  }, [tab]);
+  useEffect(() => { fetchReports(); }, [fetchReports]);
 
-  useEffect(() => {
-    if (tab === "flagged") fetchFlagged();
-    else fetchReports();
-  }, [page]);
+  /* ── Actions ── */
 
+  /**
+   * Gửi resolve/dismiss lên backend.
+   * Bắt buộc truyền adminAction để backend lưu vào job_reports.admin_action.
+   * Body: { status, admin_action, admin_note? }
+   */
+  const resolveReport = async (
+    reportId: number,
+    status: "resolved" | "dismissed",
+    adminAction: AdminAction,
+    adminNote?: string,
+  ) => {
+    await apiClient.put(`/admin/job-reports/${reportId}/resolve`, {
+      status,
+      admin_action: adminAction,
+      admin_note: adminNote,
+    });
+    toast.success(status === "resolved" ? "Đã đánh dấu xử lý." : "Đã bỏ qua báo cáo.");
+    setSelectedReport(null);
+    fetchReports();
+  };
+
+  // Backend: { action: "allow" | "pause" | "close" } — AdminJobActionEnum
   const jobAction = async (jobId: number, action: "allow" | "pause" | "close") => {
-    try {
-      await apiClient.post(`/admin/jobs/${jobId}/action`, { action });
-      toast.success(`Đã ${action === "allow" ? "duyệt" : action === "pause" ? "ẩn" : "xóa"} job.`);
-      fetchFlagged();
-    } catch { toast.error("Thao tác thất bại."); }
+    await apiClient.post(`/admin/jobs/${jobId}/action`, { action });
+    const msg = { allow: "Đã mở lại tin.", pause: "Đã tạm dừng tin.", close: "Đã đóng & khóa tin." };
+    toast.success(msg[action]);
   };
 
-  const resolveReport = async (reportId: number, action: "resolve" | "dismiss") => {
-    try {
-      await apiClient.put(`/admin/job-reports/${reportId}/resolve`, { action });
-      toast.success(action === "resolve" ? "Đã xử lý báo cáo." : "Đã bỏ qua báo cáo.");
-      fetchReports();
-    } catch { toast.error("Thao tác thất bại."); }
+  const handleStatusFilter = (s: typeof statusFilter) => {
+    setStatusFilter(s);
+    setActionFilter(""); // reset action filter khi đổi tab status
+    setPage(1);
   };
 
-  const REPORT_STATUS: Record<string, string> = {
-    pending: "pending", resolved: "approved", dismissed: "gray",
+  const handleActionFilter = (a: typeof actionFilter) => {
+    setActionFilter(a);
+    setPage(1);
   };
 
+  /* ── Render ── */
   return (
     <div>
       <Toaster />
 
       <div className={styles.card}>
+        {/* Tab lọc trạng thái báo cáo */}
         <div className={styles.tabs}>
-          <button className={cx(styles.tabBtn, { [styles.activeTab]: tab === "flagged" })} onClick={() => setTab("flagged")}>
-            AI Flagged
-          </button>
-          <button className={cx(styles.tabBtn, { [styles.activeTab]: tab === "reports" })} onClick={() => setTab("reports")}>
-            Báo cáo từ ứng viên
-          </button>
+          {STATUS_TABS.map(({ key, label }) => (
+            <button
+              key={key}
+              className={cx(styles.tabBtn, { [styles.activeTab]: statusFilter === key })}
+              onClick={() => handleStatusFilter(key)}
+            >
+              {label}
+            </button>
+          ))}
         </div>
 
-        {/* ── Tab: Flagged Jobs ── */}
-        {tab === "flagged" && (
-          <div className={styles.tableWrapper}>
-            <table>
-              <thead>
-                <tr>
-                  <th>Tiêu đề Job</th>
-                  <th>Công ty</th>
-                  <th>Lý do AI gắn cờ</th>
-                  <th>Trạng thái</th>
-                  <th style={{ textAlign: "right" }}>Hành động</th>
-                </tr>
-              </thead>
-              <tbody>
-                {loading ? (
-                  <tr><td colSpan={5}><div className={styles.emptyState}>Đang tải...</div></td></tr>
-                ) : flaggedJobs.length === 0 ? (
-                  <tr><td colSpan={5}><div className={styles.emptyState}>Không có job nào bị flag.</div></td></tr>
-                ) : flaggedJobs.map((job) => (
-                  <tr key={job.id}>
-                    <td style={{ fontWeight: 600, color: "#0f172a" }}>{job.title}</td>
-                    <td>{job.company_name}</td>
-                    <td>
-                      <span className={cx(styles.badge, styles.flagged)} style={{ maxWidth: "280px", display: "inline-block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                        {job.ai_flag_reason ?? "Không có lý do"}
-                      </span>
-                    </td>
-                    <td><span className={cx(styles.badge, styles.info)}>{job.status}</span></td>
-                    <td>
-                      <div className={styles.actionGroup} style={{ justifyContent: "flex-end" }}>
-                        <button className={cx(styles.btnSm, styles.green)} onClick={() => jobAction(job.id, "allow")}>
-                          <CheckCircle size={13} /> Duyệt
-                        </button>
-                        <button className={cx(styles.btnSm, styles.amber)} onClick={() => jobAction(job.id, "pause")}>
-                          <EyeOff size={13} /> Ẩn
-                        </button>
-                        <button className={cx(styles.btnSm, styles.red)} onClick={() => jobAction(job.id, "close")}>
-                          <Trash2 size={13} /> Xóa
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        {/* Tab lọc hình thức xử lý — chỉ hiện khi đang xem tab "Đã xử lý" */}
+        {statusFilter === "resolved" && (
+          <div className={styles.tabs} style={{ borderTop: "1px solid #f1f5f9", background: "#fafafa" }}>
+            {ACTION_TABS.map(({ key, label }) => (
+              <button
+                key={key}
+                className={cx(styles.tabBtn, { [styles.activeTab]: actionFilter === key })}
+                onClick={() => handleActionFilter(key)}
+                style={{ fontSize: "0.78rem" }}
+              >
+                {label}
+              </button>
+            ))}
           </div>
         )}
 
-        {/* ── Tab: Reports ── */}
-        {tab === "reports" && (
-          <div className={styles.tableWrapper}>
-            <table>
-              <thead>
-                <tr>
-                  <th>Job title</th>
-                  <th>Công ty</th>
-                  <th>Người báo cáo</th>
-                  <th>Lý do</th>
-                  <th>Trạng thái</th>
-                  <th style={{ textAlign: "right" }}>Hành động</th>
-                </tr>
-              </thead>
-              <tbody>
-                {loading ? (
-                  <tr><td colSpan={6}><div className={styles.emptyState}>Đang tải...</div></td></tr>
-                ) : reports.length === 0 ? (
-                  <tr><td colSpan={6}><div className={styles.emptyState}>Không có báo cáo nào.</div></td></tr>
-                ) : reports.map((r) => (
-                  <tr key={r.id}>
-                    <td style={{ fontWeight: 600, color: "#0f172a" }}>{r.job_title}</td>
-                    <td>{r.company_name}</td>
-                    <td style={{ fontSize: "0.8rem", color: "#64748b" }}>{r.reporter_email}</td>
-                    <td style={{ maxWidth: "220px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.reason}</td>
-                    <td>
-                      <span className={cx(styles.badge, styles[REPORT_STATUS[r.status] ?? "gray"])}>
-                        {r.status === "pending" ? "Chờ" : r.status === "resolved" ? "Đã xử lý" : "Bỏ qua"}
-                      </span>
-                    </td>
-                    <td>
-                      <div className={styles.actionGroup} style={{ justifyContent: "flex-end" }}>
-                        <Link href={`/admin/companies`}>
-                          <button className={cx(styles.btnSm, styles.blue)}><Eye size={13} /> Xem Job</button>
-                        </Link>
-                        {r.status === "pending" && (
-                          <>
-                            <button className={cx(styles.btnSm, styles.green)} onClick={() => resolveReport(r.id, "resolve")}>
-                              <CheckSquare size={13} /> Xử lý
-                            </button>
-                            <button className={cx(styles.btnSm, styles.gray)} onClick={() => resolveReport(r.id, "dismiss")}>
-                              <XSquare size={13} /> Bỏ qua
-                            </button>
-                          </>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+        {/* Bảng báo cáo */}
+        <ReportsTable
+          reports={reports}
+          loading={loading}
+          page={page}
+          onViewJob={(r) => setSelectedReport(r)}
+          onResolve={resolveReport}
+        />
 
+        {/* Phân trang */}
         <div className={styles.pagination}>
-          <button disabled={page <= 1} onClick={() => setPage(p => p - 1)}>← Trước</button>
+          <button disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>← Trước</button>
           <span style={{ fontSize: "0.8rem", color: "#64748b", padding: "0 0.5rem" }}>Trang {page}</span>
-          <button disabled={(tab === "flagged" ? flaggedJobs : reports).length < PAGE_SIZE} onClick={() => setPage(p => p + 1)}>Tiếp →</button>
+          <button disabled={reports.length < PAGE_SIZE} onClick={() => setPage((p) => p + 1)}>Tiếp →</button>
         </div>
       </div>
+
+      {/* Popup xem chi tiết job */}
+      {selectedReport && (
+        <JobDetailPopup
+          jobId={selectedReport.job_id}
+          reportId={selectedReport.id}
+          reportStatus={selectedReport.status}
+          onClose={() => setSelectedReport(null)}
+          onReportAction={resolveReport}
+          onJobAction={jobAction}
+        />
+      )}
     </div>
   );
 }
