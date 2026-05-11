@@ -52,7 +52,7 @@ export default function ForgotPasswordPage() {
             onChange={(e) => setEmail(e.target.value)}
           />
 
-          <Button disabled={!valid} loading={loading}>
+          <Button disabled={!valid} loading={loading} type="submit">
             Gửi liên kết xác nhận
           </Button>
         </form>

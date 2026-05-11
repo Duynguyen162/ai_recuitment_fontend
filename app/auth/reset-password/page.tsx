@@ -82,7 +82,7 @@ export default function ResetPasswordPage() {
           />
 
           <div style={{ marginTop: "1rem" }}>
-            <Button disabled={!isValid} loading={loading}>
+            <Button disabled={!isValid} loading={loading} type="submit">
               Cập nhật mật khẩu
             </Button>
           </div>

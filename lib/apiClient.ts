@@ -3,6 +3,7 @@ import { useAuthStore } from "@/store/authStore";
 
 const apiClient = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
+  withCredentials: true,
 });
 
 // Tự động gắn "Authorization: Bearer <token>" vào mọi request
@@ -14,14 +15,19 @@ apiClient.interceptors.request.use((config) => {
   return config;
 });
 
-// Tự động logout khi token hết hạn
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      useAuthStore.getState().logout();
-      deleteCookies();
-      window.location.replace("/auth/login");
+      if (typeof window !== "undefined") {
+        useAuthStore.getState().logout();
+        
+        document.cookie = "role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; SameSite=Lax";
+        
+        if (!window.location.pathname.startsWith("/auth/login")) {
+          window.location.replace("/auth/login");
+        }
+      }
     }
     return Promise.reject(error);
   }
