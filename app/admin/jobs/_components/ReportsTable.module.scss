@@ -1,0 +1,76 @@
+/* CSS Module cho ReportsTable */
+
+.row {
+  cursor: default;
+}
+
+.colNum {
+  color: #94a3b8;
+  font-size: 0.78rem;
+  width: 36px;
+}
+
+.colTitle {
+  font-weight: 600;
+  color: #0f172a;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.colCompany {
+  font-size: 0.82rem;
+}
+
+.colReporter {
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+.colReason {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.82rem;
+  color: #475569;
+}
+
+.colDate {
+  font-size: 0.78rem;
+  color: #94a3b8;
+  white-space: nowrap;
+}
+
+/* Cột trạng thái — gom nhiều dòng thông tin */
+.colStatus {
+  min-width: 160px;
+}
+
+.statusStack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  align-items: flex-start;
+}
+
+.adminNote {
+  font-size: 0.72rem;
+  color: #64748b;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: help;
+}
+
+.resolvedAt {
+  font-size: 0.7rem;
+  color: #94a3b8;
+  white-space: nowrap;
+}
+
+.colActions {
+  text-align: right;
+}

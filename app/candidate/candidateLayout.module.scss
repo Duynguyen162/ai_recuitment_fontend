@@ -27,6 +27,16 @@
 
 @media (max-width: 1024px) {
   .mainArea {
-    margin-left: 2rem;
+    margin-left: 80px;
+  }
+}
+
+@media (max-width: 768px) {
+  .mainArea {
+    margin-left: 0 !important;
+    margin-bottom: 60px; /* Space for bottom nav */
+  }
+  .contentArea {
+    padding: 1rem;
   }
 }
