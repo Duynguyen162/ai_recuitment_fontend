@@ -7,7 +7,6 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const role = request.cookies.get("role")?.value;
-
   const isValidRole = VALID_ROLES.includes(role || "");
 
   const getDefaultRoute = (userRole: string) =>
@@ -23,8 +22,8 @@ export function middleware(request: NextRequest) {
     pathname.startsWith("/candidate") ||
     pathname.startsWith("/hr_manager") ||
     pathname.startsWith("/admin");
-
-    if (isProtectedRoute && !isValidRole) {
+    
+  if (isProtectedRoute && !isValidRole) {
     const loginUrl = new URL("/auth/login", request.url);
     loginUrl.searchParams.set("redirect", pathname);
     return NextResponse.redirect(loginUrl);
@@ -54,6 +53,12 @@ export function middleware(request: NextRequest) {
         new URL(getDefaultRoute(role!), request.url)
       );
     }
+
+    if (pathname === "/") {
+      return NextResponse.redirect(
+        new URL(getDefaultRoute(role!), request.url)
+      );
+    }
   }
 
   return NextResponse.next();
@@ -61,6 +66,7 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
+    "/",
     "/candidate/:path*",
     "/hr_manager/:path*",
     "/admin/:path*",

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import cx from "classnames";
+import JobAIChat from "./JobAIChat";
 import {
     MapPin,
     DollarSign,
@@ -391,6 +392,7 @@ export default function JobDetailPage() {
                 </div>
             )}
             <Toaster />
+            <JobAIChat companyName={job.company.name} jobId={job.id} />
         </div>
     );
 }
