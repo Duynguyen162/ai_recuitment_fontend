@@ -29,7 +29,12 @@ interface Company {
     name: string;
     logo_url: string;
 }
-
+interface User {
+    id: number;
+    name: string;
+    email: string;
+    role: string;
+}
 interface JobData {
     id: number;
     title: string;
@@ -97,6 +102,21 @@ export default function JobDetailPage() {
 
         fetchJobDetail();
     }, [id]);
+
+    const [user, setUser] = useState<User | null>(null);
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const res = await apiClient.get("/auth/me");
+                setUser(res.data);
+            } catch {
+                setUser(null);
+            }
+        };
+        fetchUser();
+    }, []);
+
 
     if (loading) {
         return (
@@ -392,7 +412,7 @@ export default function JobDetailPage() {
                 </div>
             )}
             <Toaster />
-            <JobAIChat companyName={job.company.name} jobId={job.id} />
+            {job.status === "published" && <JobAIChat companyName={job.company.name} jobId={job.id} />}
         </div>
     );
 }

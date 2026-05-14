@@ -101,7 +101,7 @@ export default function SavedJobsPage() {
                     savedJobs.map((job) => (
                         <div key={job.id} className={styles.jobCard}>
                             <div className={styles.jobMainInfo}>
-                                <Link href={`/jobs/${job.id}`} className={styles.jobTitle}>
+                                <Link href={`/candidate/job_detail?id=${job.id}`} className={styles.jobTitle}>
                                     {job.title}
                                 </Link>
                                 <div className={styles.companyName}>

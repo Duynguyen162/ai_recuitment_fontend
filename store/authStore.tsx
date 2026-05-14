@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import apiClient from "@/lib/apiClient";
 
 interface User {
   id: number;
@@ -10,25 +11,34 @@ interface User {
 
 interface AuthState {
   user: User | null;
-  token: string | null;
   isAuthenticated: boolean;
-  login: (userData: User, token: string) => void;
+  login: (userData: User) => void;
   logout: () => void;
+  fetchUser: () => Promise<void>; // Hàm đồng bộ thông tin từ Backend
 }
 
 export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
       user: null,
-      token: null,
       isAuthenticated: false,
 
-      login: (userData, token) =>
-        set({ user: userData, token, isAuthenticated: true }),
+      login: (userData) => set({ user: userData, isAuthenticated: true }),
 
-      logout: () =>
-        set({ user: null, token: null, isAuthenticated: false }),
+      logout: () => set({ user: null, isAuthenticated: false }),
+
+      fetchUser: async () => {
+        try {
+          const res = await apiClient.get("/auth/me");
+          if (res.data?.data) {
+            set({ user: res.data.data, isAuthenticated: true });
+          }
+        } catch (error) {
+          // Nếu API /me lỗi (ví dụ token hết hạn), thực hiện logout
+          set({ user: null, isAuthenticated: false });
+        }
+      },
     }),
-    { name: "auth-storage" } // Tự lưu vào localStorage
+    { name: "auth-storage" }
   )
 );

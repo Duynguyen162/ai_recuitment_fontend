@@ -75,14 +75,25 @@ const JobAIChat: React.FC<JobAIChatProps> = ({ companyName, jobId }) => {
             };
 
             setMessages((prev) => [...prev, aiResponse]);
-        } catch (err) {
-            const errorMsg: Message = {
-                id: (Date.now() + 1).toString(),
-                text: "Lỗi rồi, AI đang đi uống trà ^^",
-                sender: "ai",
-                timestamp: new Date(),
-            };
-            setMessages((prev) => [...prev, errorMsg]);
+        } catch (err: any) {
+            if (err.response.status === 401) {
+                const errorMsg: Message = {
+                    id: (Date.now() + 1).toString(),
+                    text: "Bạn cần đăng nhập để trò chuyện.",
+                    sender: "ai",
+                    timestamp: new Date(),
+                };
+                setMessages((prev) => [...prev, errorMsg]);
+
+            } else {
+                const errorMsg: Message = {
+                    id: (Date.now() + 1).toString(),
+                    text: "Lỗi rồi, AI đang đi uống trà ^^",
+                    sender: "ai",
+                    timestamp: new Date(),
+                };
+                setMessages((prev) => [...prev, errorMsg]);
+            }
         } finally {
             setIsTyping(false);
         }
