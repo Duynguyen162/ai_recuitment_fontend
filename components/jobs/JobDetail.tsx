@@ -22,6 +22,7 @@ import ApplyJobModal from "./ApplyJobModal";
 import ConfirmModal from "../ui/ConfirmModal";
 import { formatDate } from "@/utils/formatDate";
 import { formatSalary } from "@/utils/formatSalary";
+import { useAuthStore } from "@/store/authStore";
 
 // Giao diện dữ liệu chuẩn theo API cung cấp
 interface Company {
@@ -102,21 +103,7 @@ export default function JobDetailPage() {
 
         fetchJobDetail();
     }, [id]);
-
-    const [user, setUser] = useState<User | null>(null);
-
-    useEffect(() => {
-        const fetchUser = async () => {
-            try {
-                const res = await apiClient.get("/auth/me");
-                setUser(res.data);
-            } catch {
-                setUser(null);
-            }
-        };
-        fetchUser();
-    }, []);
-
+    const { user } = useAuthStore();
 
     if (loading) {
         return (
@@ -151,7 +138,7 @@ export default function JobDetailPage() {
         setIsDeleting(true); // Bật loading của Modal
         try {
             await apiClient.delete("/application/delete_apply", {
-                params: { job_id: id },
+                params: { job_id: Number(id) },
             });
             setHasApplied(false);
             toast.success("Đã xóa CV thành công");
@@ -186,6 +173,12 @@ export default function JobDetailPage() {
 
     const handleReportJob = async () => {
         if (!job || !reportReason.trim()) return;
+
+        if (!user) {
+            toast.error("Vui lòng đăng nhập để thực hiện tính năng này");
+            return;
+        }
+
         setIsReporting(true);
         try {
             await apiClient.post(`/job/report_job?job_id=${job.id}`, { reason: reportReason.trim() });

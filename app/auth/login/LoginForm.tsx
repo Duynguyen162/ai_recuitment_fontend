@@ -28,15 +28,12 @@ export default function LoginForm({ redirectUrl }: LoginFormProps) {
 
     const valid = email.length > 3 && password.length > 3;
 
-    // LoginForm.tsx
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setLoading(true);
         setErrorMsg("");
 
         try {
-            document.cookie = "role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; SameSite=Lax";
-
             const res = await apiClient.post(
                 "/auth/login",
                 { email, password },
@@ -44,9 +41,6 @@ export default function LoginForm({ redirectUrl }: LoginFormProps) {
             const { id, email: userEmail, role } = res.data.data;
 
             login({ id, email: userEmail, role });
-
-            // role cookie có thể giữ lại để UI check nhanh (không dùng để auth)
-            document.cookie = `role=${role}; path=/; max-age=86400; SameSite=Lax`;
 
             if (redirectUrl) {
                 window.location.href = redirectUrl;

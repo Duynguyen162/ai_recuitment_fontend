@@ -1,0 +1,81 @@
+.adminLoginContainer {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  background: #020617; // Slate 950
+  overflow: hidden;
+  font-family: 'Inter', sans-serif;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at center, rgba(30, 58, 138, 0.15) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.loginCard {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 440px;
+  background: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(51, 65, 85, 0.5);
+  border-radius: 1.5rem;
+  padding: 2.5rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+
+  .shieldIcon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.5));
+  }
+
+  h1 {
+    color: #f8fafc;
+    font-size: 1.75rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.025em;
+  }
+
+  p {
+    color: #94a3b8;
+    font-size: 0.875rem;
+  }
+}
+
+.content {
+  margin-bottom: 2rem;
+}
+
+.footer {
+  text-align: center;
+  border-top: 1px solid rgba(51, 65, 85, 0.5);
+  padding-top: 1.5rem;
+  
+  span {
+    color: #475569;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+}
+
+@media (max-width: 480px) {
+  .loginCard {
+    margin: 1rem;
+    padding: 1.5rem;
+  }
+}

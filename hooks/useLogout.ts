@@ -5,19 +5,22 @@ import { useRouter } from "next/navigation";
 
 export function useLogout() {
   const router = useRouter();
-  const { logout } = useAuthStore();
+  const { logout ,user } = useAuthStore();
 
   return async () => {
+     const currentRole = user?.role;
     try {
       await apiClient.post("/auth/logout");
     } catch (error) {
       console.error("Logout error:", error);
     } finally {
       logout();
-      document.cookie =
-        "role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; SameSite=Lax";
 
-      router.push("/auth/login");
+      if (currentRole === "admin") {
+        router.push("/admin/login");
+      } else {
+        router.push("/auth/login");
+      }
     }
   };
 }

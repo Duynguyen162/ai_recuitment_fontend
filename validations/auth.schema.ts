@@ -4,11 +4,18 @@ import { z } from "zod";
 // Quy tắc mật khẩu: Tối thiểu 8 ký tự, có chữ hoa, chữ thường, số, ký tự đặc biệt (FR-C-01.1)
 const passwordRule = z
   .string()
+  .trim()
   .min(8, "Mật khẩu phải có ít nhất 8 ký tự")
   .regex(/[a-z]/, "Phải chứa ít nhất 1 chữ thường")
   .regex(/[A-Z]/, "Phải chứa ít nhất 1 chữ hoa")
   .regex(/[0-9]/, "Phải chứa ít nhất 1 chữ số")
-  .regex(/[^a-zA-Z0-9]/, "Phải chứa ít nhất 1 ký tự đặc biệt");
+  .regex(/[^a-zA-Z0-9]/, "Phải chứa ít nhất 1 ký tự đặc biệt")
+  .refine(
+    (val) => new TextEncoder().encode(val).length <= 72,
+    {
+      message: "Mật khẩu quá dài",
+    }
+  );
 
 const emailRule = z
   .string()

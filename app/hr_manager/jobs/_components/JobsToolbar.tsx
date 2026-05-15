@@ -35,7 +35,7 @@ export default function JobsToolbar({
             onClick={() => onFilterChange(status)}
           >
             {label}
-            <span className={styles.countBadge}>{counts[status]}</span>
+            {/* <span className={styles.countBadge}>{counts[status]}</span> */}
           </button>
         ))}
       </div>

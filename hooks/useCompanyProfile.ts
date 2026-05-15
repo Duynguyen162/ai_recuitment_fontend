@@ -37,7 +37,7 @@ export function useCompanyProfile() {
         const res = await apiClient.get("/companies/my_company");
         setCompany({ ...defaultCompanyProfile, ...res.data?.data });
       } catch (error) {
-        console.error("Khong the tai thong tin cong ty:", error);
+        console.error("Không thể tải thông tin công ty:", error);
       } finally {
         setLoading(false);
       }

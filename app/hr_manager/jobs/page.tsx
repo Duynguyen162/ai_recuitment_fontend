@@ -30,18 +30,34 @@ export default function JobsManagementPage() {
   });
   const [filterStatus, setFilterStatus] = useState<JobStatus>("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
   const [deletingJob, setDeletingJob] = useState<HrJob | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [previewJob, setPreviewJob] = useState<HrJob | null>(null);
 
-  const fetchJobs = async (page: number, pageSize: number) => {
+  // Debounce search query to avoid excessive API calls
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  const fetchJobs = async (
+    page: number,
+    pageSize: number,
+    status: string,
+    search: string,
+  ) => {
     setLoading(true);
     try {
       const res = await apiClient.get("/job/get_jobs_create_by_hr", {
         params: {
           page,
           page_size: pageSize,
+          status: status === "all" ? undefined : status,
+          search: search.trim() || undefined,
         },
       });
 
@@ -68,8 +84,13 @@ export default function JobsManagementPage() {
   };
 
   useEffect(() => {
-    fetchJobs(pagination.page, pagination.page_size);
-  }, [pagination.page, pagination.page_size]);
+    fetchJobs(
+      pagination.page,
+      pagination.page_size,
+      filterStatus,
+      debouncedSearch,
+    );
+  }, [pagination.page, pagination.page_size, filterStatus, debouncedSearch]);
 
   useEffect(() => {
     const handlePointerDown = (event: MouseEvent) => {
@@ -105,38 +126,15 @@ export default function JobsManagementPage() {
     };
   }, [previewJob]);
 
-  const filteredJobs = useMemo(() => {
-    const normalizedQuery = searchQuery.trim().toLowerCase();
-
-    return jobs.filter((job) => {
-      const matchStatus =
-        filterStatus === "all" ? true : job.status === filterStatus;
-      const matchSearch =
-        normalizedQuery.length === 0
-          ? true
-          : [
-              job.title,
-              job.location,
-              job.company?.name ?? "",
-              ...(job.tags ?? []),
-            ]
-              .join(" ")
-              .toLowerCase()
-              .includes(normalizedQuery);
-
-      return matchStatus && matchSearch;
-    });
-  }, [jobs, filterStatus, searchQuery]);
-
   const counts = useMemo(
     () => ({
-      all: jobs.length,
+      all: pagination.total,
       published: jobs.filter((job) => job.status === "published").length,
       draft: jobs.filter((job) => job.status === "draft").length,
       paused: jobs.filter((job) => job.status === "paused").length,
       closed: jobs.filter((job) => job.status === "closed").length,
     }),
-    [jobs],
+    [jobs, pagination.total],
   );
 
   const summary = useMemo(
@@ -179,6 +177,16 @@ export default function JobsManagementPage() {
       page: 1,
       page_size: nextPageSize,
     }));
+  };
+
+  const handleFilterChange = (status: JobStatus) => {
+    setFilterStatus(status);
+    setPagination((prev) => ({ ...prev, page: 1 }));
+  };
+
+  const handleSearchChange = (query: string) => {
+    setSearchQuery(query);
+    setPagination((prev) => ({ ...prev, page: 1 }));
   };
 
   const handleChangeStatus = async (job: HrJob, status: string) => {
@@ -237,13 +245,13 @@ export default function JobsManagementPage() {
         counts={counts}
         filterStatus={filterStatus}
         searchQuery={searchQuery}
-        onFilterChange={setFilterStatus}
-        onSearchChange={setSearchQuery}
+        onFilterChange={handleFilterChange}
+        onSearchChange={handleSearchChange}
       />
 
       <div className={styles.tableContainer}>
         <JobsTable
-          jobs={filteredJobs}
+          jobs={jobs}
           loading={loading}
           openMenuId={openMenuId}
           onToggleMenu={setOpenMenuId}

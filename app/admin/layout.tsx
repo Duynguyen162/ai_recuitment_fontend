@@ -32,6 +32,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const pageTitle = menuItems.find((m) => pathname.startsWith(m.path))?.name ?? "Admin";
 
+  // Không hiển thị sidebar/header cho trang login
+  if (pathname === "/admin/login") {
+    return <>{children}</>;
+  }
+
   return (
     <div className={styles.layout}>
       <aside className={cx(styles.sidebar, { [styles.closed]: !sidebarOpen })}>
