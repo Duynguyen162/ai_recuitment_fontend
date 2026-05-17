@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import axios from "axios";
+import apiClient from "@/lib/apiClient";
 
 import { useAuthStore } from "@/store/authStore";
 
@@ -11,6 +11,7 @@ import InputField from "../../../components/ui/InputField";
 import Button from "../../../components/ui/Button";
 import SocialLogin from "../components/SocialLogin";
 import styles from "./login.module.scss";
+import axios from "axios";
 
 type LoginFormProps = {
     redirectUrl?: string;
@@ -27,36 +28,26 @@ export default function LoginForm({ redirectUrl }: LoginFormProps) {
 
     const valid = email.length > 3 && password.length > 3;
 
-    // LoginForm.tsx
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setLoading(true);
         setErrorMsg("");
 
         try {
-            // ✅ TRƯỚC KHI LOGIN: xóa cookie cũ
-            document.cookie = "role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; SameSite=Lax";
-
-            const res = await axios.post(
-                `${process.env.NEXT_PUBLIC_API_URL}/auth/login`,
+            const res = await apiClient.post(
+                "/auth/login",
                 { email, password },
             );
-            const { id, email: userEmail, role, token } = res.data.data;
+            const { id, email: userEmail, role } = res.data.data;
 
-            login({ id, email: userEmail, role }, token);
-
-            // ✅ SAU KHI LOGIN: set cookie mới
-            document.cookie = `role=${role}; path=/; max-age=86400; SameSite=Lax`;
-
-            // Đợi cookie được set
-            await new Promise(resolve => setTimeout(resolve, 50));
+            login({ id, email: userEmail, role });
 
             if (redirectUrl) {
-                router.replace(redirectUrl);
+                window.location.href = redirectUrl;
             } else if (role === "candidate") {
-                router.push("/candidate/search_job");
+                window.location.href = "/candidate/search_job";
             } else {
-                router.push(`/${role}/dashboard`);
+                window.location.href = `/${role}/dashboard`;
             }
         } catch (error: unknown) {
             if (axios.isAxiosError(error)) {

@@ -3,39 +3,34 @@ import { useAuthStore } from "@/store/authStore";
 
 const apiClient = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
-  withCredentials: true,
-});
-
-// Tự động gắn "Authorization: Bearer <token>" vào mọi request
-apiClient.interceptors.request.use((config) => {
-  const token = useAuthStore.getState().token;
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
+  withCredentials: true,// cho trình duyệt gửi cookie kèm req
 });
 
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      if (typeof window !== "undefined") {
+    const status = error.response?.status;
+
+    if (status === 401) {
+      if (typeof window !== "undefined") { 
         useAuthStore.getState().logout();
         
-        document.cookie = "role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; SameSite=Lax";
+        const pathname = window.location.pathname;
+        const isAuthPage = pathname.startsWith("/auth/login") || pathname.startsWith("/admin/login");
         
-        if (!window.location.pathname.startsWith("/auth/login")) {
-          window.location.replace("/auth/login");
+        // Chỉ redirect nếu đang ở trang bảo mật (candidate, hr_manager, admin)
+        const isProtectedRoute = pathname.startsWith("/candidate") || 
+                                 pathname.startsWith("/hr_manager") || 
+                                 (pathname.startsWith("/admin") && !pathname.startsWith("/admin/login"));
+        
+        if (!isAuthPage && isProtectedRoute) {
+            window.location.href = "/auth/login";
         }
-      }
+      } 
     }
+
     return Promise.reject(error);
   }
 );
-
-// Xóa cookies khi logout
-export function deleteCookies() {
-  document.cookie = "role=; path=/; max-age=0";
-}
 
 export default apiClient;

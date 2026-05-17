@@ -32,8 +32,6 @@ const menuItems = [
         href: "/candidate/followed_companies",
         icon: Building2,
     },
-    { name: "Gợi ý AI", href: "/candidate/ai-recommendations", icon: Sparkles },
-    { name: "Thông báo", href: "/candidate/notifications", icon: Bell },
 ];
 
 export default function CandidateSidebar({
