@@ -1,4 +1,4 @@
-import { Search } from "lucide-react";
+import { Search, X } from "lucide-react";
 import cx from "classnames";
 
 import styles from "../jobsManagement.module.scss";
@@ -48,6 +48,16 @@ export default function JobsToolbar({
           value={searchQuery}
           onChange={(event) => onSearchChange(event.target.value)}
         />
+        {searchQuery && (
+          <button
+            type="button"
+            className={styles.clearSearchBtn}
+            onClick={() => onSearchChange("")}
+            title="Xóa tìm kiếm"
+          >
+            <X size={16} />
+          </button>
+        )}
       </div>
     </div>
   );

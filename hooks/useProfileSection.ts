@@ -8,14 +8,18 @@ export function useProfileSection<T extends { id: string }>(endpoint: string) {
   const [items, setItems] = useState<T[]>([]);
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   // 1. Fetch dữ liệu ban đầu
   const fetchItems = useCallback(async () => {
+    setIsLoading(true);
     try {
       const res = await apiClient.get(endpoint);
       setItems(res.data.data);
     } catch (error) {
       console.error(`Lỗi tải dữ liệu từ ${endpoint}:`, error);
+    } finally {
+      setIsLoading(false);
     }
   }, [endpoint]);
 
@@ -95,6 +99,7 @@ export function useProfileSection<T extends { id: string }>(endpoint: string) {
     items,
     isAdding,
     editingId,
+    isLoading,
     setEditingId,
     handleSave,
     handleDelete,

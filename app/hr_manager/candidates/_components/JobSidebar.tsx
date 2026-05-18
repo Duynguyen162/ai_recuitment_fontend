@@ -28,9 +28,6 @@ export default function JobSidebar({
           <span className={styles.panelEyebrow}>Danh sách job</span>
           <h2>Chọn job cần xem ứng viên</h2>
         </div>
-        {/* <Button variant="ghost" onClick={onRefresh} title="Tải lại danh sách">
-          <RefreshCcw size={16} />
-        </Button> */}
       </div>
 
       <div className={styles.jobList}>

@@ -76,6 +76,7 @@ export default function CompanyJobs({ companyId }: CompanyJobsProps) {
               }
               jobType={job.job_type}
               postedDate={dayjs(job.created_at).fromNow()}
+              isSaved={job.is_save}
             />
           ))
         ) : (

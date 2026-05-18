@@ -98,6 +98,31 @@
 /* LIST */
 .listContainer {
   padding: 1rem 1.5rem;
+  position: relative;
+  transition: opacity 0.3s ease;
+  min-height: 100px;
+  
+  &.isLoading {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+}
+
+.topLoader {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background-color: #2563eb;
+  border-radius: 3px;
+  animation: loadingBar 1.5s infinite ease-in-out;
+  z-index: 10;
+}
+
+@keyframes loadingBar {
+  0% { width: 0%; left: 0; }
+  50% { width: 50%; left: 25%; }
+  100% { width: 0%; left: 100%; }
 }
 
 .listItem {

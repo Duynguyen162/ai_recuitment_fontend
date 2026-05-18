@@ -41,6 +41,7 @@ export interface Applicant {
   status: AppStatus;
   interview: InterviewSchedule | null;
   notes: string | null;
+  job_title?: string;
 }
 
 export interface InterviewScheduleFormValues {

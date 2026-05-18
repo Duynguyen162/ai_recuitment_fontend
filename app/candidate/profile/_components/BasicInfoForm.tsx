@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import cx from "classnames";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -65,8 +66,11 @@ export default function BasicInfoForm() {
     },
   });
 
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
     const profileData = async () => {
+      setIsLoading(true);
       try {
         const res = await apiClient.get("/profiles/profileCandidate");
         const data = res.data.data;
@@ -82,6 +86,8 @@ export default function BasicInfoForm() {
         });
       } catch (error) {
         console.log(error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -119,7 +125,8 @@ export default function BasicInfoForm() {
   };
 
   return (
-    <div className={styles.formWrapper}>
+    <div className={cx(styles.formWrapper, { [styles.isLoading]: isLoading })} style={{ position: 'relative' }}>
+      {isLoading && <div className={styles.topLoader}></div>}
       <h3>Thông tin cốt lõi</h3>
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className={styles.inputGrid}>

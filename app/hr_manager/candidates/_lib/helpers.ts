@@ -53,9 +53,15 @@ export function getMeetingFieldHint(mode: InterviewMode) {
 export function getInterviewSummary(schedule: InterviewSchedule | null) {
   if (!schedule) return null;
 
-  return `${schedule.mode ? formatInterviewMode(schedule.mode) : "Phỏng vấn"} • ${formatInterviewTime(
-    schedule.interview_time,
-  )}`;
+  const modeStr = schedule.meeting_link?.trim()
+    ? "Online"
+    : schedule.location?.trim()
+      ? "Offline"
+      : schedule.mode
+        ? formatInterviewMode(schedule.mode)
+        : "Phỏng vấn";
+
+  return `${modeStr} • ${formatInterviewTime(schedule.interview_time)}`;
 }
 
 export function shouldShowActionControls(tab: CandidatesTab) {

@@ -153,9 +153,10 @@ export function normalizeApplicant(item: unknown): Applicant | null {
             meeting_link: meetingLink,
             location: location,
             notes: interviewNotes,
-            mode: normalizeInterviewMode(source.interview_type),
+            mode: meetingLink.trim() ? "online" : (location.trim() ? "offline" : "online"),
           }
         : null,
     notes: typeof source.notes === "string" ? source.notes : null,
+    job_title: typeof source.job_title === "string" ? source.job_title : (typeof source.job_name === "string" ? source.job_name : (typeof source.position === "string" ? source.position : "Chưa cập nhật")),
   };
 }

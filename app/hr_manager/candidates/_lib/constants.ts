@@ -15,7 +15,6 @@ export const TAB_ORDER: CandidatesTab[] = [
   "interviewing",
   "hired",
   "rejected",
-  "withdrawn",
   "left_company",
 ];
 
@@ -40,11 +39,11 @@ export function getTabLabel(tab: CandidatesTab) {
 
 export function getAvailableActions(tab: CandidatesTab): AppStatus[] {
   if (tab === "applied") {
-    return ["interviewing", "rejected", "withdrawn"];
+    return ["interviewing", "rejected"];
   }
 
   if (tab === "interviewing") {
-    return ["hired", "rejected", "withdrawn"];
+    return ["hired", "rejected"];
   }
 
   if (tab === "hired") {

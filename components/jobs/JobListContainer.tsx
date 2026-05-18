@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import styles from "./JobListContainer.module.scss";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import JobSearchBar from "@/components/jobs/JobSearchBar";
 import SidebarFilter, { FilterParams } from "@/components/jobs/SideBarFilter";
 import JobCard from "@/components/jobs/JobCard";
@@ -18,6 +18,7 @@ dayjs.locale("vi");
 
 export default function JobsPage() {
     const router = useRouter();
+    const pathname = usePathname();
     const searchParams = useSearchParams();
     const keywordFromUrl = searchParams.get("keyword");
 
@@ -103,7 +104,7 @@ export default function JobsPage() {
 
     const handleSearch = (query: string) => {
         setIsFilterOpen(false); // Đóng bộ lọc khi search
-        router.push(`/public/jobs?keyword=${encodeURIComponent(query)}`);
+        router.push(`${pathname}?keyword=${encodeURIComponent(query)}`);
     };
 
     const handleApplyFilter = (newFilters: FilterParams) => {
@@ -115,30 +116,6 @@ export default function JobsPage() {
     const handleClearFilter = () => {
         setFilters({ location: "", jobType: "", experience: "" });
         setIsFilterOpen(false);
-    };
-
-    const handleBookmark = async (id: string) => {
-        try {
-            const job = jobResults.find(j => j.id === id);
-
-            if (job?.isSaved) {
-                await apiClient.delete(`/job/delete_save_job?job_id=${id}`);
-            } else {
-                await apiClient.post(`/job/save_job/${id}`);
-            }
-
-            setJobResults(prev =>
-                prev.map(j =>
-                    j.id === id
-                        ? { ...j, isSaved: !j.isSaved }
-                        : j
-                )
-            );
-
-            toast.success(job?.isSaved ? "Đã bỏ lưu" : "Đã lưu");
-        } catch (error) {
-            toast.error("Lỗi");
-        }
     };
 
     const formatCurrency = (amount: number) => {
@@ -182,13 +159,15 @@ export default function JobsPage() {
                 </div>
             </div>
 
-            {isCandidate && !searchQuery && (
+            {isCandidate && (
                 <div className={styles.tabsContainer}>
                     <button
                         className={`${styles.tabItem} ${activeTab === "matched" ? styles.active : ""}`}
                         onClick={() => {
                             setActiveTab("matched");
                             setPage(1);
+                            setSearchQuery("");
+                            router.push(pathname);
                         }}
                     >
                         Việc làm phù hợp
@@ -199,6 +178,8 @@ export default function JobsPage() {
                         onClick={() => {
                             setActiveTab("all");
                             setPage(1);
+                            setSearchQuery("");
+                            router.push(pathname);
                         }}
                     >
                         Tất cả việc làm
@@ -221,31 +202,34 @@ export default function JobsPage() {
                         </span>
                     </div>
 
-                    <div className={styles.jobGrid}>
-                        {loading ? (
-                            <p className={styles.loadingText}>Đang tải việc làm...</p>
-                        ) : (
-                            Array.isArray(jobResults) &&
-                            jobResults.map((job) => (
-                                <JobCard
-                                    key={job.id}
-                                    id={job.id}
-                                    title={job.title}
-                                    companyName={job.company?.name || "Đang cập nhật"}
-                                    location={job.location}
-                                    yearsOfExperience={job.years_of_experience}
-                                    salaryRange={
-                                        job.salary_max
-                                            ? `${formatCurrency(job.salary_min)} - ${formatCurrency(job.salary_max)}`
-                                            : "Thỏa thuận"
-                                    }
-                                    jobType={job.job_type}
-                                    postedDate={dayjs(job.created_at).fromNow()}
-                                    isSaved={job.isSaved}
-                                    onBookmarkClick={handleBookmark}
-                                />
-                            ))
-                        )}
+                    <div className={`${styles.jobGridWrapper} ${loading ? styles.isLoading : ""}`}>
+                        {loading && <div className={styles.topLoader}></div>}
+                        <div className={styles.jobGrid}>
+                            {(!jobResults || jobResults.length === 0) && !loading ? (
+                                <p className={styles.emptyText}>Không tìm thấy công việc nào phù hợp.</p>
+                            ) : (
+                                Array.isArray(jobResults) &&
+                                jobResults.map((job) => (
+                                    <JobCard
+                                        key={job.id}
+                                        id={job.id}
+                                        title={job.title}
+                                        logoUrl={job.company?.logo_url || ""}
+                                        companyName={job.company?.name || "Đang cập nhật"}
+                                        location={job.location}
+                                        yearsOfExperience={job.years_of_experience}
+                                        salaryRange={
+                                            job.salary_max
+                                                ? `${formatCurrency(job.salary_min)} - ${formatCurrency(job.salary_max)}`
+                                                : "Thỏa thuận"
+                                        }
+                                        jobType={job.job_type}
+                                        postedDate={dayjs(job.created_at).fromNow()}
+                                        isSaved={job.is_save}
+                                    />
+                                ))
+                            )}
+                        </div>
                     </div>
 
                     {totalPages > 0 && (

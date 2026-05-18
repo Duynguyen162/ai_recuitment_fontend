@@ -148,9 +148,30 @@
     color: #94a3b8;
   }
 
+  .clearSearchBtn {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #94a3b8;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+
+    &:hover {
+      background: #f1f5f9;
+      color: #0f172a;
+    }
+  }
+
   input {
     width: 100%;
-    padding: 0.65rem 1rem 0.65rem 2.5rem;
+    padding: 0.65rem 2.2rem 0.65rem 2.5rem;
     border: 1px solid #e2e8f0;
     border-radius: 0.7rem;
     font-size: 0.875rem;
@@ -184,6 +205,7 @@
   position: relative;
   overflow-x: auto;
   overflow-y: visible;
+  transition: opacity 0.3s ease, filter 0.3s ease;
 
   table {
     width: 100%;
@@ -454,6 +476,7 @@
 .paginationActions {
   display: flex;
   align-items: center;
+  width: 40%;
   gap: 0.75rem;
 }
 
@@ -662,9 +685,9 @@
 }
 
 .isRevalidating {
-  opacity: 0.6;
+  opacity: 0.5;
+  filter: blur(2px);
   pointer-events: none;
-  transition: opacity 0.3s ease;
 }
 
 .topLoadingBar {

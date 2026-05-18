@@ -26,18 +26,24 @@ export function middleware(request: NextRequest) {
     // Nếu đã login mà vào trang auth/login hoặc admin/login
     if (isAuthRoute && role) {
       const dashboard = role === "candidate" ? "/candidate/search_job" : `/${role}/dashboard`;
-      return NextResponse.redirect(new URL(dashboard, request.url));
+      const targetUrl = new URL(dashboard, request.url);
+      targetUrl.search = request.nextUrl.search;
+      return NextResponse.redirect(targetUrl);
     }
 
     // Chặn người dùng không phải admin vào route admin
     if (pathname.startsWith("/admin") && role !== "admin") {
       const dashboard = role === "candidate" ? "/candidate/search_job" : `/${role}/dashboard`;
-      return NextResponse.redirect(new URL(dashboard, request.url));
+      const targetUrl = new URL(dashboard, request.url);
+      targetUrl.search = request.nextUrl.search;
+      return NextResponse.redirect(targetUrl);
     }
     
     if(pathname === "/" || pathname.startsWith("/public")){
       const dashboard = role === "candidate" ? "/candidate/search_job" : `/${role}/dashboard`;
-      return NextResponse.redirect(new URL(dashboard, request.url));
+      const targetUrl = new URL(dashboard, request.url);
+      targetUrl.search = request.nextUrl.search;
+      return NextResponse.redirect(targetUrl);
     }
   }
 

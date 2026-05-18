@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import AuthSync from "@/components/auth/AuthSync";
+import NextTopLoader from "nextjs-toploader";
 
 const inter = Inter({
   subsets: ["latin", "vietnamese"],
@@ -20,6 +21,7 @@ export default function RootLayout({
   return (
     <html lang="vi">
       <body className={inter.className}>
+        <NextTopLoader color="#2563eb" showSpinner={false} height={3} />
         <AuthSync />
         {children}
       </body>

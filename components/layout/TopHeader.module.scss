@@ -24,6 +24,16 @@
   gap: 1rem;
 }
 
+.pageTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1e293b;
+  letter-spacing: -0.01em;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .menuBtn {
   background: none;
   border: none;
@@ -176,4 +186,99 @@
     opacity: 1;
     transform: translateY(0) scale(1);
   }
+}
+
+.notificationWrapper {
+  position: relative;
+}
+
+.notificationDropdown {
+  position: absolute;
+  top: 110%;
+  right: -50px;
+  width: 340px;
+  background: #ffffff;
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  padding: 0;
+  z-index: 50;
+  animation: fadeIn 0.2s ease;
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+
+  @media (max-width: 640px) {
+    right: -100px;
+  }
+}
+
+.notifHeader {
+  padding: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  font-weight: 600;
+  font-size: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.markAllBtn {
+  font-size: 0.75rem;
+  color: #3b82f6;
+  background: none;
+  border: none;
+  cursor: pointer;
+  
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.notifList {
+  max-height: 350px;
+  overflow-y: auto;
+}
+
+.notifItem {
+  padding: 1rem;
+  border-bottom: 1px solid #f3f4f6;
+  cursor: pointer;
+  transition: background 0.2s;
+  
+  &:hover {
+    background: #f9fafb;
+  }
+  
+  &.unread {
+    background: #eff6ff;
+  }
+  
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.notifTitle {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 0.25rem;
+}
+
+.notifMsg {
+  font-size: 0.8125rem;
+  color: #4b5563;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+}
+
+.notifTime {
+  font-size: 0.6875rem;
+  color: #9ca3af;
+}
+
+.notifEmpty {
+  padding: 2rem 1rem;
+  text-align: center;
+  color: #6b7280;
+  font-size: 0.875rem;
 }
