@@ -36,11 +36,8 @@ export default function ApplyJobModal({
         setMounted(true);
     }, []);
 
-    // State lưu CV đang chọn:
-    // Giá trị "PROFILE" nghĩa là dùng CV hệ thống tự tạo
-    const [selectedCvId, setSelectedCvId] = useState<string>("PROFILE");
+    const [selectedCvId, setSelectedCvId] = useState<string>("profile");
 
-    // Lấy danh sách CV upload từ API của bạn
     useEffect(() => {
         const fetchCVs = async () => {
             try {
@@ -61,9 +58,9 @@ export default function ApplyJobModal({
 
         // Chuẩn bị cục dữ liệu gửi xuống Backend
         const payload = {
-            job_id: jobId,
-            cv_type: selectedCvId === "PROFILE" ? "PROFILE" : "UPLOADED",
-            cv_id: selectedCvId === "PROFILE" ? null : selectedCvId,
+            job_id: Number(jobId),
+            cv_type: selectedCvId === "profile" ? "profile" : "uploaded_cv",
+            cv_id: selectedCvId === "profile" ? null : Number(selectedCvId),
         };
 
         try {
@@ -73,8 +70,19 @@ export default function ApplyJobModal({
                 onSuccess(); // Báo cho Component cha biết
                 onClose(); // Đóng Modal
             }
-        } catch (error) {
-            toast.error("Có lỗi xảy ra khi nộp đơn.");
+        } catch (error: any) {
+            const status = error.response?.status;
+            const detail = error.response?.data?.detail || error.response?.data?.message;
+
+            if (status === 400) {
+                toast.error(detail || "Bạn đã ứng tuyển công việc này trước đó.");
+            } else if (status === 404) {
+                toast.error(detail || "Hồ sơ CV không tồn tại hoặc không thuộc về tài khoản này.");
+            } else if (status === 422) {
+                toast.error(detail || "Thiếu thông tin CV khi chọn nộp bằng CV tải lên.");
+            } else {
+                toast.error(detail || "Có lỗi xảy ra khi nộp đơn ứng tuyển.");
+            }
         } finally {
             setIsSubmitting(false);
         }
@@ -96,17 +104,15 @@ export default function ApplyJobModal({
                     </button>
                 </div>
 
-                {/* Body: Lựa chọn CV */}
                 <div className={styles.body}>
                     <h3>Chọn hồ sơ ứng tuyển</h3>
 
                     <div className={styles.cvOptions}>
-                        {/* Lựa chọn 1: CV Hệ thống (Profile) */}
                         <div
                             className={cx(styles.cvCard, {
-                                [styles.selected]: selectedCvId === "PROFILE",
+                                [styles.selected]: selectedCvId === "profile",
                             })}
-                            onClick={() => setSelectedCvId("PROFILE")}
+                            onClick={() => setSelectedCvId("profile")}
                         >
                             <div className={styles.cvInfo}>
                                 <div className={cx(styles.iconWrapper, styles.profileIcon)}>
@@ -122,12 +128,11 @@ export default function ApplyJobModal({
                                     </div>
                                 </div>
                             </div>
-                            {selectedCvId === "PROFILE" && (
+                            {selectedCvId === "profile" && (
                                 <CheckCircle2 className={styles.checkIcon} size={20} />
                             )}
                         </div>
 
-                        {/* Lựa chọn 2: Các CV đã Upload */}
                         {loadingCVs ? (
                             <div style={{ textAlign: "center", padding: "1rem" }}>
                                 <Loader2 className="animate-spin" />
@@ -161,7 +166,6 @@ export default function ApplyJobModal({
                     </div>
                 </div>
 
-                {/* Footer: Nút hành động */}
                 <div className={styles.footer}>
                     <Button variant="outline" onClick={onClose} disabled={isSubmitting}>
                         Hủy

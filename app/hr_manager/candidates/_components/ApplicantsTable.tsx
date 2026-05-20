@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Eye, FileText, Lock, Mail, Sparkles, StickyNote } from "lucide-react";
+import { Eye, FileText, Lock, Mail, RefreshCw, Sparkles, StickyNote, User } from "lucide-react";
 import cx from "classnames";
 
 import Button from "@/components/ui/Button";
@@ -29,6 +29,7 @@ interface ApplicantsTableProps {
     isFetchingBackground: boolean;
     onPageChange: (newPage: number) => void;
     onPreviewCv: (applicationId: number) => void;
+    onViewProfile: (applicant: Applicant) => void;
     onOpenAiReview: (applicant: Applicant) => void;
     onSelectAction: (applicant: Applicant, nextStatus: AppStatus) => void;
     onOpenNotes: (applicant: Applicant) => void;
@@ -64,6 +65,7 @@ export default function ApplicantsTable({
     isFetchingBackground,
     onPageChange,
     onPreviewCv,
+    onViewProfile,
     onOpenAiReview,
     onSelectAction,
     onOpenNotes,
@@ -153,7 +155,17 @@ export default function ApplicantsTable({
                                     )}
                                     {activeTab !== "interviewing" && (
                                         <td>
-                                            {app.cv_id ? (
+                                            {app.cv_type === "profile" ? (
+                                                <button
+                                                    type="button"
+                                                    className={styles.cvPreviewBtn}
+                                                    style={{ background: "#eff6ff", color: "#2563eb", borderColor: "#bfdbfe" }}
+                                                    onClick={() => onViewProfile(app)}
+                                                >
+                                                    <User size={14} />
+                                                    Xem hồ sơ
+                                                </button>
+                                            ) : app.cv_id ? (
                                                 <button
                                                     type="button"
                                                     className={styles.cvPreviewBtn}
@@ -170,14 +182,59 @@ export default function ApplicantsTable({
                                     {activeTab !== "interviewing" && (
                                         <td>
                                             {isVip ? (
-                                                <div
-                                                    className={cx(
-                                                        styles.aiScore,
-                                                        styles[getScoreTone(app.ai_score)],
-                                                    )}
-                                                >
-                                                    {app.ai_score}
-                                                </div>
+                                                app.ai_status === "done" || app.ai_score > 0 ? (
+                                                    <div
+                                                        className={cx(
+                                                            styles.aiScore,
+                                                            styles[getScoreTone(app.ai_score)],
+                                                        )}
+                                                    >
+                                                        {app.ai_score}
+                                                    </div>
+                                                ) : app.ai_status === "dead" ? (
+                                                    <span style={{ color: "#ef4444", fontSize: "0.75rem", fontWeight: 700 }} title="AI phân tích thất bại hoàn toàn.">
+                                                        Thất bại
+                                                    </span>
+                                                ) : app.ai_status === "failed" ? (
+                                                    <div
+                                                        style={{
+                                                            fontSize: "0.75rem",
+                                                            color: "#f59e0b",
+                                                            fontWeight: 600,
+                                                            display: "inline-flex",
+                                                            alignItems: "center",
+                                                            gap: "0.25rem",
+                                                            whiteSpace: "nowrap"
+                                                        }}
+                                                        title="Hệ thống đang tự động thử chấm điểm lại..."
+                                                    >
+                                                        <RefreshCw size={12} className="animate-spin" />
+                                                        Đang thử lại...
+                                                    </div>
+                                                ) : app.ai_status === "processing" || app.ai_status === "queued" || app.ai_status === "not_queued" ? (
+                                                    <div
+                                                        style={{
+                                                            background: "#f8fafc",
+                                                            color: "#64748b",
+                                                            border: "1px dashed #cbd5e1",
+                                                            fontSize: "0.75rem",
+                                                            padding: "0.4rem 0.6rem",
+                                                            borderRadius: "999px",
+                                                            fontWeight: 600,
+                                                            display: "inline-flex",
+                                                            alignItems: "center",
+                                                            gap: "0.25rem",
+                                                            whiteSpace: "nowrap"
+                                                        }}
+                                                        title="Đang phân tích AI..."
+                                                    >
+                                                        <Sparkles size={12} className="animate-pulse" color="#3b82f6" />
+                                                        Đang quét...
+                                                    </div>
+                                                ) : (
+                                                    // "pending" hoặc không xác định: chưa có dữ liệu từ AI
+                                                    <span style={{ color: "#cbd5e1", fontSize: "0.85rem", fontWeight: 600 }} title="Chưa có điểm AI">–</span>
+                                                )
                                             ) : (
                                                 <Link
                                                     href="/hr_manager/pricing"

@@ -158,5 +158,12 @@ export function normalizeApplicant(item: unknown): Applicant | null {
         : null,
     notes: typeof source.notes === "string" ? source.notes : null,
     job_title: typeof source.job_title === "string" ? source.job_title : (typeof source.job_name === "string" ? source.job_name : (typeof source.position === "string" ? source.position : "Chưa cập nhật")),
+    cv_type: (source.cv_type === "profile" || source.cv_type === "uploaded_cv") 
+      ? source.cv_type 
+      : (source.cv_id ? "uploaded_cv" : "profile"),
+    ai_status: (["not_queued","queued","processing","done","failed","dead"].includes(source.ai_status))
+      ? source.ai_status
+      : (Number(source.ai_score ?? source.match_score ?? 0) > 0 ? "done" : "pending"),
+    candidate_id: source.candidate_id ? Number(source.candidate_id) : undefined,
   };
 }
