@@ -41,6 +41,10 @@ export interface Applicant {
   status: AppStatus;
   interview: InterviewSchedule | null;
   notes: string | null;
+  job_title?: string;
+  cv_type?: "profile" | "uploaded_cv";
+  ai_status?: "not_queued" | "queued" | "processing" | "done" | "failed" | "dead" | "pending";
+  candidate_id?: number;
 }
 
 export interface InterviewScheduleFormValues {
@@ -49,4 +53,33 @@ export interface InterviewScheduleFormValues {
   location: string;
   notes: string;
   mode: InterviewMode;
+}
+
+export interface CandidateProfileData {
+  candidate_name: string;
+  email: string;
+  phone?: string;
+  address?: string;
+  date_of_birth?: string;
+  summary?: string;
+  experiences?: Array<{
+    company: string;
+    position: string;
+    start_date: string;
+    end_date?: string;
+    description?: string;
+  }>;
+  educations?: Array<{
+    school: string;
+    degree: string;
+    major?: string;
+    start_date: string;
+    end_date?: string;
+  }>;
+  certifications?: Array<{
+    name: string;
+    issuer?: string;
+    issued_date?: string;
+  }>;
+  skills?: string[];
 }

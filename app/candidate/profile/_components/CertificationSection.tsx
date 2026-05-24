@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import cx from "classnames";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -25,7 +26,7 @@ const certSchema = z.object({
 
 type CertFormValues = z.infer<typeof certSchema>;
 
-export default function CertificationSection() {
+export default function CertificationSection({ refreshTrigger }: { refreshTrigger?: number }) {
   const {
     items: certifications,
     isAdding,
@@ -34,7 +35,8 @@ export default function CertificationSection() {
     openAddForm,
     openEditForm,
     closeForm,
-  } = useProfileSection<Certification>("/profiles/certifications");
+    isLoading,
+  } = useProfileSection<Certification>("/profiles/certifications", refreshTrigger);
 
   const {
     register,
@@ -129,8 +131,9 @@ export default function CertificationSection() {
         </form>
       )}
 
-      <div className={styles.listContainer}>
-        {certifications.length === 0 && !isAdding && (
+      <div className={cx(styles.listContainer, { [styles.isLoading]: isLoading })}>
+        {isLoading && <div className={styles.topLoader}></div>}
+        {certifications.length === 0 && !isAdding && !isLoading && (
           <p style={{ textAlign: "center", color: "#6b7280", padding: "1rem" }}>
             Chưa có chứng chỉ nào.
           </p>

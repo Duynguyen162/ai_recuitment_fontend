@@ -120,11 +120,13 @@ export default function JobPreviewModal({
               Đóng
             </Button>
           </div>
-          <Link href={`/hr_manager/jobs/${job.id}/edit`}>
-            <Button>
-              <Edit2 size={16} /> Mở trang chỉnh sửa
-            </Button>
-          </Link>
+          {job.status !== "closed" && job.status !== "published" && (
+            <Link href={`/hr_manager/jobs/${job.id}/edit`}>
+              <Button>
+                <Edit2 size={16} /> Mở trang chỉnh sửa
+              </Button>
+            </Link>
+          )}
         </div>
       </div>
     </div>

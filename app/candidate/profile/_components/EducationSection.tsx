@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import cx from "classnames";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -28,7 +29,7 @@ const eduSchema = z.object({
 
 type EduFormValues = z.infer<typeof eduSchema>;
 
-export default function EducationSection() {
+export default function EducationSection({ refreshTrigger }: { refreshTrigger?: number }) {
   const {
     items: educations,
     isAdding,
@@ -38,7 +39,8 @@ export default function EducationSection() {
     openAddForm,
     openEditForm,
     closeForm,
-  } = useProfileSection<Education>("/profiles/educations");
+    isLoading,
+  } = useProfileSection<Education>("/profiles/educations", refreshTrigger);
 
   const {
     register,
@@ -147,8 +149,9 @@ export default function EducationSection() {
         </form>
       )}
 
-      <div className={styles.listContainer}>
-        {educations.length === 0 && !isAdding && (
+      <div className={cx(styles.listContainer, { [styles.isLoading]: isLoading })}>
+        {isLoading && <div className={styles.topLoader}></div>}
+        {educations.length === 0 && !isAdding && !isLoading && (
           <p style={{ textAlign: "center", color: "#6b7280", padding: "1rem" }}>
             Chưa có thông tin học vấn.
           </p>

@@ -4,24 +4,28 @@ import apiClient from "@/lib/apiClient";
 import toast from "react-hot-toast";
 
 // Ép kiểu T phải luôn có trường id là string
-export function useProfileSection<T extends { id: string }>(endpoint: string) {
+export function useProfileSection<T extends { id: string }>(endpoint: string, refreshTrigger?: number) {
   const [items, setItems] = useState<T[]>([]);
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   // 1. Fetch dữ liệu ban đầu
   const fetchItems = useCallback(async () => {
+    setIsLoading(true);
     try {
       const res = await apiClient.get(endpoint);
       setItems(res.data.data);
     } catch (error) {
       console.error(`Lỗi tải dữ liệu từ ${endpoint}:`, error);
+    } finally {
+      setIsLoading(false);
     }
   }, [endpoint]);
 
   useEffect(() => {
     fetchItems();
-  }, [fetchItems]);
+  }, [fetchItems, refreshTrigger]);
 
   //Logic Lưu (Xử lý cả Thêm mới và Cập nhật)
   const handleSave = async (data: Partial<T>, id?: string | null) => {
@@ -95,6 +99,7 @@ export function useProfileSection<T extends { id: string }>(endpoint: string) {
     items,
     isAdding,
     editingId,
+    isLoading,
     setEditingId,
     handleSave,
     handleDelete,

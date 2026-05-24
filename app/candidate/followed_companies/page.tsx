@@ -68,7 +68,7 @@ export default function FollowedCompaniesPage() {
 
             {companies.length === 0 ? (
                 <div className={styles.emptyState}>
-                    <Building2 size={48} className={styles.emptyIcon} />
+                    {/* <Building2 size={48} className={styles.emptyIcon} /> */}
                     <p>Bạn chưa theo dõi công ty nào.</p>
                     <Link href="/candidate/search_job">
                         <button className="btn-primary" style={{ padding: "10px 20px", borderRadius: "8px", background: "#2563eb", color: "white", border: "none", cursor: "pointer" }}>

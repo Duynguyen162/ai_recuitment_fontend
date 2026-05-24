@@ -53,6 +53,7 @@ interface JobData {
     company: Company;
     is_save: boolean;
     has_applied: boolean;
+    application_status?: string; // TODO: Backend cần bổ sung trường này để Frontend biết trạng thái đơn ứng tuyển hiện tại (pending, review, interviewing, rejected...)
 }
 
 export default function JobDetailPage() {
@@ -141,7 +142,7 @@ export default function JobDetailPage() {
                 params: { job_id: Number(id) },
             });
             setHasApplied(false);
-            toast.success("Đã xóa CV thành công");
+            toast.success("Đã xóa hủy ứng tuyển thành công");
         } catch (error) {
             toast.error("Lỗi khi xóa");
         } finally {
@@ -282,7 +283,7 @@ export default function JobDetailPage() {
                         <div className={styles.actionCard}>
                             <button
                                 className={hasApplied ? styles.dltApplyBtn : styles.applyBtn}
-                                disabled={job.status !== "published"}
+                                disabled={job.status !== "published" || (hasApplied && !!job.application_status && !['pending', 'review', 'applied'].includes(job.application_status))}
                                 onClick={() => {
                                     if (hasApplied) {
                                         openDeleteConfirm(job.id.toString());
@@ -292,7 +293,7 @@ export default function JobDetailPage() {
                                 }}
                             >
                                 {hasApplied
-                                    ? "Hủy ứng tuyển"
+                                    ? (job.application_status && !['pending', 'review', 'applied'].includes(job.application_status) ? "Đơn đã được xử lý" : "Hủy ứng tuyển")
                                     : job.status !== "published"
                                         ? "Tin đã đóng"
                                         : "Ứng tuyển ngay"}

@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import cx from "classnames";
-import { FileText } from "lucide-react";
+import { FileText, FileSpreadsheet } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
 
 import styles from "./profile.module.scss";
@@ -11,36 +11,40 @@ import ExperienceSection from "./_components/ExperienceSection";
 import EducationSection from "./_components/EducationSection";
 import CertificationSection from "./_components/CertificationSection";
 import CvUploadSection from "./_components/CvUploadSection";
+import PdfPreviewModal from "./_components/PdfPreviewModal";
+import ExcelImportModal from "./_components/ExcelImportModal";
 import Button from "@/components/ui/Button";
 import apiClient from "@/lib/apiClient";
 
 export default function CandidateProfilePage() {
   const [activeTab, setActiveTab] = useState("basic");
-  const [isExporting, setIsExporting] = useState(false);
+  const [isLoadingPreview, setIsLoadingPreview] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
+  const [showImportExcel, setShowImportExcel] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  const handleExportPDF = async () => {
-    if (isExporting) return;
+  /**
+   * Hàm fetch PDF – được truyền vào PdfPreviewModal.
+   * Modal tự gọi lại khi cần retry, không cần lưu blob ở đây.
+   */
+  const fetchPdf = useCallback(async (): Promise<Blob> => {
+    const response = await apiClient.get("/profiles/export_cv", {
+      responseType: "blob",
+    });
+    return response.data as Blob;
+  }, []);
 
+  const handleOpenPreview = async () => {
+    if (isLoadingPreview) return;
     try {
-      setIsExporting(true);
-      const response = await apiClient.get("/profiles/export_cv", {
-        responseType: "blob",
-      });
-
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", "My_CV.pdf");
-      document.body.appendChild(link);
-      link.click();
-      link.parentNode?.removeChild(link);
-      window.URL.revokeObjectURL(url);
-
-      toast.success("Xuất CV thành công.");
+      setIsLoadingPreview(true);
+      // Kiểm tra nhanh xem API có phản hồi không trước khi mở modal
+      // (nếu muốn bỏ qua bước check này, xoá try/catch và gọi setShowPreview(true) trực tiếp)
+      setShowPreview(true);
     } catch {
-      toast.error("Không thể xuất file PDF. Vui lòng thử lại!");
+      toast.error("Không thể tải CV. Vui lòng thử lại!");
     } finally {
-      setIsExporting(false);
+      setIsLoadingPreview(false);
     }
   };
 
@@ -56,14 +60,22 @@ export default function CandidateProfilePage() {
         </div>
 
         <div className={styles.actions}>
+          <button
+            type="button"
+            onClick={() => setShowImportExcel(true)}
+            className={styles.importBtn}
+          >
+            <FileSpreadsheet size={18} />
+            Nhập từ Excel
+          </button>
           <Button
             variant="outline"
-            onClick={handleExportPDF}
-            disabled={isExporting}
+            onClick={handleOpenPreview}
+            disabled={isLoadingPreview}
             className={styles.exportBtn}
           >
             <FileText size={18} />
-            {isExporting ? "Đang xuất..." : "Xuất CV PDF"}
+            {isLoadingPreview ? "Đang tải..." : "Xem & Xuất CV PDF"}
           </Button>
         </div>
       </div>
@@ -113,13 +125,28 @@ export default function CandidateProfilePage() {
         </div>
 
         <div className={styles.tabContent}>
-          {activeTab === "basic" && <BasicInfoForm />}
-          {activeTab === "experience" && <ExperienceSection />}
-          {activeTab === "education" && <EducationSection />}
-          {activeTab === "certification" && <CertificationSection />}
+          {activeTab === "basic" && <BasicInfoForm refreshTrigger={refreshTrigger} />}
+          {activeTab === "experience" && <ExperienceSection refreshTrigger={refreshTrigger} />}
+          {activeTab === "education" && <EducationSection refreshTrigger={refreshTrigger} />}
+          {activeTab === "certification" && <CertificationSection refreshTrigger={refreshTrigger} />}
           {activeTab === "upload_cv" && <CvUploadSection />}
         </div>
       </div>
+
+      {showPreview && (
+        <PdfPreviewModal
+          fetchPdf={fetchPdf}
+          onClose={() => setShowPreview(false)}
+        />
+      )}
+
+      {showImportExcel && (
+        <ExcelImportModal
+          onClose={() => setShowImportExcel(false)}
+          onSuccess={() => setRefreshTrigger((prev) => prev + 1)}
+        />
+      )}
+
       <Toaster />
     </div>
   );

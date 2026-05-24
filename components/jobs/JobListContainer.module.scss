@@ -216,26 +216,49 @@
   gap: 1.5rem;
 }
 
-.loadingText {
+.jobGridWrapper {
+  position: relative;
+  transition: opacity 0.3s ease;
+  min-height: 200px;
+  
+  &.isLoading {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+}
+
+.topLoader {
+  position: absolute;
+  top: -16px;
+  left: 0;
+  height: 4px;
+  background-color: #2563eb;
+  border-radius: 4px;
+  animation: loadingBar 1.5s infinite ease-in-out;
+  z-index: 10;
+}
+
+@keyframes loadingBar {
+  0% {
+    width: 0%;
+    left: 0;
+  }
+  50% {
+    width: 50%;
+    left: 25%;
+  }
+  100% {
+    width: 0%;
+    left: 100%;
+  }
+}
+
+.emptyText {
   grid-column: 1 / -1;
   text-align: center;
   padding: 40px 0;
-  font-size: 18px;
-  font-weight: 500;
+  font-size: 1.125rem;
   color: #6b7280;
-  animation: fadePulse 1.5s infinite;
-}
-
-@keyframes fadePulse {
-  0% {
-    opacity: 0.4;
-  }
-  50% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0.4;
-  }
 }
 
 .pagination {

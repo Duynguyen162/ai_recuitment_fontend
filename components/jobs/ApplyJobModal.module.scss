@@ -7,7 +7,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 50; /* Đảm bảo nằm đè lên mọi thứ */
+  z-index: 9999; /* Đảm bảo nằm đè lên mọi thứ */
   padding: 1rem;
 }
 

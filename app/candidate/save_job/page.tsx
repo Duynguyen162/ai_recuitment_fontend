@@ -91,7 +91,7 @@ export default function SavedJobsPage() {
             <div className={styles.jobList}>
                 {savedJobs.length === 0 ? (
                     <div className={styles.emptyState}>
-                        <BookmarkMinus size={48} className={styles.emptyIcon} />
+                        {/* <BookmarkMinus size={48} className={styles.emptyIcon} /> */}
                         <p>Bạn chưa lưu công việc nào.</p>
                         <Link href="/candidate/search_job">
                             <Button variant="primary">Khám phá việc làm mới</Button>

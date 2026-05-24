@@ -887,7 +887,13 @@
   gap: 0.75rem;
   padding-top: 1.25rem;
 }
-
+.btnEye{
+    background-color: transparent;
+    border: none;
+    color: rgb(100, 99, 99);
+    margin-right: 1.6rem;
+    cursor: pointer;
+}
 @media (max-width: 1100px) {
   .workspace {
     grid-template-columns: 1fr;
