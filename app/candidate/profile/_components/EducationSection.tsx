@@ -29,7 +29,7 @@ const eduSchema = z.object({
 
 type EduFormValues = z.infer<typeof eduSchema>;
 
-export default function EducationSection() {
+export default function EducationSection({ refreshTrigger }: { refreshTrigger?: number }) {
   const {
     items: educations,
     isAdding,
@@ -40,7 +40,7 @@ export default function EducationSection() {
     openEditForm,
     closeForm,
     isLoading,
-  } = useProfileSection<Education>("/profiles/educations");
+  } = useProfileSection<Education>("/profiles/educations", refreshTrigger);
 
   const {
     register,

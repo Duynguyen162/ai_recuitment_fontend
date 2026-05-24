@@ -85,6 +85,26 @@
   width: fit-content;
   display: flex;
   align-items: center;
+  gap: 0.75rem;
+}
+
+.importBtn {
+  width: fit-content;
+  min-width: unset;
+  padding: 0.5rem 1rem;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #059669;
+  border-color: #a7f3d0;
+  background: #ecfdf5;
+
+  &:hover:not(:disabled) {
+    color: #047857;
+    border-color: #6ee7b7;
+    background: #d1fae5;
+  }
 }
 
 .exportBtn {

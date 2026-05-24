@@ -28,7 +28,7 @@ const expSchema = z.object({
 });
 type ExpFormValues = z.infer<typeof expSchema>;
 
-export default function ExperienceSection() {
+export default function ExperienceSection({ refreshTrigger }: { refreshTrigger?: number }) {
   // Gọi Custom Hook
   const {
     items: experiences,
@@ -40,7 +40,7 @@ export default function ExperienceSection() {
     openEditForm,
     closeForm,
     isLoading,
-  } = useProfileSection<Experience>("/profiles/experiences");
+  } = useProfileSection<Experience>("/profiles/experiences", refreshTrigger);
 
   const {
     register,

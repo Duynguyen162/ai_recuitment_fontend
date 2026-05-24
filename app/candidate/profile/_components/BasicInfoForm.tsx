@@ -44,7 +44,7 @@ const basicInfoSchema = z.object({
 
 type BasicInfoFormValues = z.infer<typeof basicInfoSchema>;
 
-export default function BasicInfoForm() {
+export default function BasicInfoForm({ refreshTrigger }: { refreshTrigger?: number }) {
   const {
     register,
     handleSubmit,
@@ -92,7 +92,7 @@ export default function BasicInfoForm() {
     };
 
     profileData();
-  }, [reset]);
+  }, [reset, refreshTrigger]);
 
   const skill = useWatch({
     control,

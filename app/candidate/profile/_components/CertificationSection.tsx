@@ -26,7 +26,7 @@ const certSchema = z.object({
 
 type CertFormValues = z.infer<typeof certSchema>;
 
-export default function CertificationSection() {
+export default function CertificationSection({ refreshTrigger }: { refreshTrigger?: number }) {
   const {
     items: certifications,
     isAdding,
@@ -36,7 +36,7 @@ export default function CertificationSection() {
     openEditForm,
     closeForm,
     isLoading,
-  } = useProfileSection<Certification>("/profiles/certifications");
+  } = useProfileSection<Certification>("/profiles/certifications", refreshTrigger);
 
   const {
     register,

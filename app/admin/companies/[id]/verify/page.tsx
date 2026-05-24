@@ -16,14 +16,14 @@ interface CompanyDetail {
     description?: string;
     size?: string;
     verification_status: string;
-    verifications?: VerificationRecord[];
+    verification_history?: VerificationRecord[];
     documents?: CompanyDocument[];
 }
 
 interface VerificationRecord {
     id: number;
     status: string;
-    submitted_at: string;
+    created_at: string;
     license_url?: string;
     reviewer_note?: string;
 }
@@ -71,7 +71,7 @@ export default function AdminCompanyVerifyPage() {
     if (loading) return <div style={{ padding: "2rem", color: "#64748b" }}>Đang tải...</div>;
     if (!company) return <div style={{ padding: "2rem", color: "#ef4444" }}>Không tìm thấy công ty.</div>;
 
-    const latestVerification = company.verifications?.[0];
+    const latestVerification = company.verification_history?.[0];
 
     return (
         <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
@@ -112,9 +112,9 @@ export default function AdminCompanyVerifyPage() {
                     <div className={styles.card}>
                         <div className={styles.cardHeader}><h3>Lịch sử xác minh</h3></div>
                         <div style={{ padding: "1rem 1.25rem" }}>
-                            {company.verifications && company.verifications.length > 0 ? (
+                            {company.verification_history && company.verification_history.length > 0 ? (
                                 <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-                                    {company.verifications.map((v, i) => (
+                                    {company.verification_history.map((v, i) => (
                                         <div key={v.id} style={{ display: "flex", gap: "0.75rem", alignItems: "flex-start" }}>
                                             <div style={{
                                                 width: 10, height: 10, borderRadius: "50%", marginTop: "0.3rem", flexShrink: 0,
@@ -124,7 +124,7 @@ export default function AdminCompanyVerifyPage() {
                                                 <div style={{ fontSize: "0.85rem", fontWeight: 600, color: "#0f172a" }}>
                                                     {STATUS_LABELS[v.status] ?? v.status}
                                                     <span style={{ fontWeight: 400, color: "#64748b", marginLeft: "0.5rem" }}>
-                                                        {new Date(v.submitted_at).toLocaleDateString("vi-VN")}
+                                                        {new Date(v.created_at).toLocaleDateString("vi-VN")}
                                                     </span>
                                                 </div>
                                                 {v.reviewer_note && <div style={{ fontSize: "0.78rem", color: "#64748b", marginTop: "0.2rem" }}>{v.reviewer_note}</div>}
@@ -144,16 +144,49 @@ export default function AdminCompanyVerifyPage() {
                         </div>
                     </div>
 
-                    {/* Latest license PDF viewer */}
+                    {/* Latest license PDF/Image viewer */}
                     {latestVerification?.license_url && (
                         <div className={styles.card}>
-                            <div className={styles.cardHeader}><h3>Giấy phép kinh doanh</h3></div>
-                            <div style={{ padding: "1rem" }}>
-                                <iframe
-                                    src={latestVerification.license_url}
-                                    style={{ width: "100%", height: "420px", border: "1px solid #e2e8f0", borderRadius: "0.5rem" }}
-                                    title="Giấy phép kinh doanh"
-                                />
+                            <div className={styles.cardHeader} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                                <h3>Giấy phép kinh doanh</h3>
+                                <a 
+                                    href={latestVerification.license_url} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer" 
+                                    style={{ fontSize: "0.825rem", color: "#2563eb", fontWeight: 600, textDecoration: "underline" }}
+                                >
+                                    Xem tab mới ↗
+                                </a>
+                            </div>
+                            <div style={{ padding: "1rem", display: "flex", justifyContent: "center", alignItems: "center", background: "#f8fafc" }}>
+                                {latestVerification.license_url.toLowerCase().endsWith(".pdf") ? (
+                                    <iframe
+                                        src={latestVerification.license_url}
+                                        style={{ width: "100%", height: "500px", border: "1px solid #e2e8f0", borderRadius: "0.5rem" }}
+                                        title="Giấy phép kinh doanh"
+                                    />
+                                ) : (
+                                    <div style={{ position: "relative", width: "100%", textAlign: "center" }}>
+                                        <a href={latestVerification.license_url} target="_blank" rel="noopener noreferrer">
+                                            <img
+                                                src={latestVerification.license_url}
+                                                alt="Giấy phép kinh doanh"
+                                                style={{ 
+                                                    maxWidth: "100%", 
+                                                    maxHeight: "500px", 
+                                                    objectFit: "contain", 
+                                                    borderRadius: "0.5rem",
+                                                    border: "1px solid #e2e8f0",
+                                                    boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+                                                    cursor: "zoom-in"
+                                                }}
+                                            />
+                                        </a>
+                                        <p style={{ fontSize: "0.75rem", color: "#64748b", marginTop: "0.5rem" }}>
+                                            (Click vào hình để xem kích thước đầy đủ ở tab mới)
+                                        </p>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     )}

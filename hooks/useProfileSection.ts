@@ -4,7 +4,7 @@ import apiClient from "@/lib/apiClient";
 import toast from "react-hot-toast";
 
 // Ép kiểu T phải luôn có trường id là string
-export function useProfileSection<T extends { id: string }>(endpoint: string) {
+export function useProfileSection<T extends { id: string }>(endpoint: string, refreshTrigger?: number) {
   const [items, setItems] = useState<T[]>([]);
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -25,7 +25,7 @@ export function useProfileSection<T extends { id: string }>(endpoint: string) {
 
   useEffect(() => {
     fetchItems();
-  }, [fetchItems]);
+  }, [fetchItems, refreshTrigger]);
 
   //Logic Lưu (Xử lý cả Thêm mới và Cập nhật)
   const handleSave = async (data: Partial<T>, id?: string | null) => {
