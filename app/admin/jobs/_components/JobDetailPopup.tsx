@@ -19,13 +19,12 @@ interface Props {
   reportId: number;
   reportStatus: "pending" | "resolved" | "dismissed";
   onClose: () => void;
-  /** Gọi khi resolve/dismiss báo cáo — bắt buộc truyền adminAction */
   onReportAction: (
     reportId: number,
     status: "resolved" | "dismissed",
     adminAction: AdminAction,
   ) => Promise<void>;
-  onJobAction: (jobId: number, action: "allow" | "pause" | "close") => Promise<void>;
+  onJobAction: (jobId: number, action: "allow" | "close") => Promise<void>;
 }
 
 export default function JobDetailPopup({
@@ -56,32 +55,29 @@ export default function JobDetailPopup({
    *  - close → API job action "close" + auto resolve báo cáo với admin_action = "closed_job"
    *  - allow → chỉ mở lại tin, KHÔNG tự động resolve báo cáo
    */
-  const handleJobAction = async (action: "allow" | "pause" | "close") => {
+  const handleJobAction = async (action: "allow"  | "close") => {
     if (!job) return;
     setActionLoading(true);
     try {
       await onJobAction(job.id, action);
 
       // Cập nhật local state
-      const statusMap = { allow: "published", pause: "paused", close: "closed" };
+      const statusMap = { allow: "published", close: "closed" };
       setJob((prev) => prev ? {
         ...prev,
         status: statusMap[action],
         locked_by_admin: action === "close" ? true : action === "allow" ? false : prev.locked_by_admin,
       } : prev);
 
-      // Với pause/close → tự động resolve báo cáo + ghi rõ admin đã làm gì
       if (reportStatus === "pending" && action !== "allow") {
-        const actionMap: Record<"pause" | "close", AdminAction> = {
-          pause: "paused_job",
+        const actionMap: Record<"close", AdminAction> = {
           close: "closed_job",
         };
         await onReportAction(reportId, "resolved", actionMap[action]);
-        return; // onReportAction sẽ đóng popup + refresh
+        return; 
       }
       onClose();
     } catch {
-      // lỗi đã toast bên trong
     } finally {
       setActionLoading(false);
     }
@@ -90,7 +86,6 @@ export default function JobDetailPopup({
   const jobStatusClass = (status: string, locked?: boolean) => {
     if (locked && status === "closed") return adminStyles.rejected;
     if (status === "published") return adminStyles.approved;
-    if (status === "paused") return adminStyles.locked;
     return adminStyles.gray;
   };
 
@@ -178,22 +173,6 @@ export default function JobDetailPopup({
                     <span className={s.autoResolveHint}>→ tự động đánh dấu báo cáo đã xử lý</span>
                   </p>
                   <div className={s.actionBtns}>
-                    {/* allow: Mở lại, KHÔNG auto-resolve */}
-                    <button
-                      className={cx(adminStyles.btnSm, adminStyles.green)}
-                      disabled={actionLoading || job.status === "published"}
-                      onClick={() => handleJobAction("allow")}
-                    >
-                      <CheckCircle size={13} /> Mở lại tin
-                    </button>
-                    {/* pause: Tạm dừng + admin_action=paused_job */}
-                    <button
-                      className={cx(adminStyles.btnSm, adminStyles.amber)}
-                      disabled={actionLoading || job.status === "paused"}
-                      onClick={() => handleJobAction("pause")}
-                    >
-                      <EyeOff size={13} /> Tạm dừng tin
-                    </button>
                     {/* close: Đóng & khóa + admin_action=closed_job */}
                     <button
                       className={cx(adminStyles.btnSm, adminStyles.red)}
@@ -208,18 +187,9 @@ export default function JobDetailPopup({
 
                 <hr className={s.divider} />
 
-                {/* ── Xử lý báo cáo KHÔNG tác động job ── */}
-                <div className={s.actionSection}>
+                 <div className={s.actionSection}>
                   <p className={s.actionSectionTitle}>Chỉ xử lý báo cáo (không tác động tin)</p>
                   <div className={s.actionBtns}>
-                    {/* warned: Cảnh cáo công ty (resolved, không sờ job) */}
-                    <button
-                      className={cx(adminStyles.btnSm, adminStyles.blue)}
-                      disabled={actionLoading}
-                      onClick={() => onReportAction(reportId, "resolved", "warned")}
-                    >
-                      <AlertTriangle size={13} /> Cảnh cáo công ty
-                    </button>
                     {/* no_action: Bỏ qua hoàn toàn (dismissed) */}
                     <button
                       className={cx(adminStyles.btnSm, adminStyles.gray)}

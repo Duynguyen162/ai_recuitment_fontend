@@ -7,6 +7,7 @@ import {
     FileText,
     Loader2,
     MapPin,
+    ShieldX,
 } from "lucide-react";
 import cx from "classnames";
 
@@ -19,6 +20,8 @@ import {
 } from "../_lib/jobManagement";
 import Button from "@/components/ui/Button";
 import { formatSalary } from "@/utils/formatSalary";
+import { useCompanyProfile } from "@/hooks/useCompanyProfile";
+import toast from "react-hot-toast";
 
 interface JobsTableProps {
     jobs: HrJob[];
@@ -39,6 +42,15 @@ export default function JobsTable({
     onChangeStatus,
     onDeleteJob,
 }: JobsTableProps) {
+    const { company } = useCompanyProfile();
+    const isLocked = company.verification_status === "locked";
+
+    const handleCreateClick = (e: React.MouseEvent) => {
+        if (isLocked) {
+            e.preventDefault();
+            toast.error("Tài khoản công ty của bạn đang bị khóa bởi Ban quản trị.");
+        }
+    };
 
     if (loading && jobs.length === 0) {
         return (
@@ -57,8 +69,8 @@ export default function JobsTable({
                 </div>
                 <h3>Không tìm thấy tin tuyển dụng nào</h3>
                 <p>Thử thay đổi bộ lọc hoặc tạo job mới để bắt đầu.</p>
-                <Link href="/hr_manager/jobs/create">
-                    <Button variant="outline">Tạo job mới</Button>
+                <Link href="/hr_manager/jobs/create" onClick={handleCreateClick}>
+                    <Button variant="outline" disabled={isLocked}>Tạo job mới</Button>
                 </Link>
             </div>
         );
@@ -86,82 +98,105 @@ export default function JobsTable({
                     </tr>
                 </thead>
                 <tbody>
-                    {jobs.map((job) => (
-                        <tr key={job.id}>
-                            <td>
-                                <div className={styles.jobMain}>
-                                    <button
-                                        type="button"
-                                        className={styles.title}
-                                        onClick={() => onOpenPreview(job)}
+                    {jobs.map((job) => {
+                        const isLockedClosed = job.locked_by_admin && job.status === "closed";
+
+                        return (
+                            <tr
+                                key={job.id}
+                                className={cx({
+                                    [styles.lockedRow]: isLockedClosed,
+                                })}
+                            >
+                                <td>
+                                    <div className={styles.jobMain}>
+                                        <button
+                                            type="button"
+                                            className={styles.title}
+                                            onClick={() => onOpenPreview(job)}
+                                        >
+                                            {job.title}
+                                        </button>
+                                        <div className={styles.meta}>
+                                            <span>
+                                                <MapPin size={12} /> {job.location || "Đang cập nhật"}
+                                            </span>
+                                            <span>
+                                                <Clock3 size={12} /> {formatJobType(job.job_type)}
+                                            </span>
+                                            <span>
+                                                <Building2 size={12} />{" "}
+                                                {job.company?.name || "Công ty của bạn"}
+                                            </span>
+                                        </div>
+                                        {!!job.tags?.length && (
+                                            <div className={styles.tagRow}>
+                                                {job.tags.slice(0, 4).map((tag) => (
+                                                    <span key={tag} className={styles.tag}>
+                                                        {tag}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        )}
+
+                                        {/* Badge cảnh báo khi bị Admin đóng */}
+                                        {isLockedClosed && (
+                                            <div className={styles.adminDangerBadge}>
+                                                <ShieldX size={14} />
+                                                <span>Bị đóng vĩnh viễn do vi phạm quy định</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <span
+                                        className={cx(styles.statusBadge, styles[job.status], {
+                                            [styles.lockedBadge]: isLockedClosed,
+                                        })}
                                     >
-                                        {job.title}
-                                    </button>
-                                    <div className={styles.meta}>
+                                        {isLockedClosed
+                                            ? "Admin đóng"
+                                            : STATUS_LABELS[job.status]}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <div className={styles.statsCol}>
                                         <span>
-                                            <MapPin size={12} /> {job.location || "Đang cập nhật"}
+                                            <BadgeDollarSign size={12} />
+                                            {formatSalary(job.salary_min, job.salary_max)}
+                                        </span>
+                                        <span>{job.years_of_experience} năm kinh nghiệm</span>
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <div className={styles.statsCol}>
+                                        <span>
+                                            <Calendar size={12} /> Tạo:{" "}
+                                            {new Date(job.created_at).toLocaleDateString("vi-VN")}
                                         </span>
                                         <span>
-                                            <Clock3 size={12} /> {formatJobType(job.job_type)}
-                                        </span>
-                                        <span>
-                                            <Building2 size={12} />{" "}
-                                            {job.company?.name || "Công ty của bạn"}
+                                            <Calendar size={12} /> Hạn:{" "}
+                                            {new Date(job.expired_at).toLocaleDateString("vi-VN")}
                                         </span>
                                     </div>
-                                    {!!job.tags?.length && (
-                                        <div className={styles.tagRow}>
-                                            {job.tags.slice(0, 4).map((tag) => (
-                                                <span key={tag} className={styles.tag}>
-                                                    {tag}
-                                                </span>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
-                            </td>
+                                </td>
 
-                            <td>
-                                <span className={cx(styles.statusBadge, styles[job.status])}>
-                                    {STATUS_LABELS[job.status]}
-                                </span>
-                            </td>
-
-                            <td>
-                                <div className={styles.statsCol}>
-                                    <span>
-                                        <BadgeDollarSign size={12} />
-                                        {formatSalary(job.salary_min, job.salary_max)}
-                                    </span>
-                                    <span>{job.years_of_experience} năm kinh nghiệm</span>
-                                </div>
-                            </td>
-
-                            <td>
-                                <div className={styles.statsCol}>
-                                    <span>
-                                        <Calendar size={12} /> Tạo:{" "}
-                                        {new Date(job.created_at).toLocaleDateString("vi-VN")}
-                                    </span>
-                                    <span>
-                                        <Calendar size={12} /> Hạn:{" "}
-                                        {new Date(job.expired_at).toLocaleDateString("vi-VN")}
-                                    </span>
-                                </div>
-                            </td>
-
-                            <td>
-                                <JobActionsMenu
-                                    job={job}
-                                    isOpen={openMenuId === job.id}
-                                    onToggle={onToggleMenu}
-                                    onOpenPreview={onOpenPreview}
-                                    onChangeStatus={onChangeStatus}
-                                    onDelete={onDeleteJob}
-                                />
-                            </td>
-                        </tr>
-                    ))}
+                                <td>
+                                    <JobActionsMenu
+                                        job={job}
+                                        isOpen={openMenuId === job.id}
+                                        onToggle={onToggleMenu}
+                                        onOpenPreview={onOpenPreview}
+                                        onChangeStatus={onChangeStatus}
+                                        onDelete={onDeleteJob}
+                                    />
+                                </td>
+                            </tr>
+                        );
+                    })}
                 </tbody>
             </table>
         </div>

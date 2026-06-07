@@ -61,8 +61,26 @@ export default function AdminCompanyVerifyPage() {
 
     const verify = async (status: "approved" | "rejected" | "locked", rejectionReason?: string) => {
         try {
-            await apiClient.put(`/admin/companies/${id}/verify`, { status, reason: rejectionReason });
+            if (status === "locked") {
+                await apiClient.put(`/admin/companies/${id}/lock`, { status, reason: rejectionReason });
+            } else {
+                const verificationId = latestVerification?.id;
+                if (!verificationId) {
+                    toast.error("Không tìm thấy yêu cầu xác minh để duyệt/từ chối.");
+                    return;
+                }
+                await apiClient.put(`/admin/verifications/${verificationId}/verify`, { status, reason: rejectionReason });
+            }
             toast.success("Đã cập nhật trạng thái.");
+            setModal(null);
+            router.push("/admin/companies");
+        } catch { toast.error("Thao tác thất bại."); }
+    };
+
+    const unlock = async () => {
+        try {
+            await apiClient.put(`/admin/companies/${id}/unlock`);
+            toast.success("Đã mở khóa tài khoản thành công.");
             setModal(null);
             router.push("/admin/companies");
         } catch { toast.error("Thao tác thất bại."); }
@@ -149,10 +167,10 @@ export default function AdminCompanyVerifyPage() {
                         <div className={styles.card}>
                             <div className={styles.cardHeader} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                                 <h3>Giấy phép kinh doanh</h3>
-                                <a 
-                                    href={latestVerification.license_url} 
-                                    target="_blank" 
-                                    rel="noopener noreferrer" 
+                                <a
+                                    href={latestVerification.license_url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
                                     style={{ fontSize: "0.825rem", color: "#2563eb", fontWeight: 600, textDecoration: "underline" }}
                                 >
                                     Xem tab mới ↗
@@ -171,10 +189,10 @@ export default function AdminCompanyVerifyPage() {
                                             <img
                                                 src={latestVerification.license_url}
                                                 alt="Giấy phép kinh doanh"
-                                                style={{ 
-                                                    maxWidth: "100%", 
-                                                    maxHeight: "500px", 
-                                                    objectFit: "contain", 
+                                                style={{
+                                                    maxWidth: "100%",
+                                                    maxHeight: "500px",
+                                                    objectFit: "contain",
                                                     borderRadius: "0.5rem",
                                                     border: "1px solid #e2e8f0",
                                                     boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
@@ -243,14 +261,25 @@ export default function AdminCompanyVerifyPage() {
                                 <XCircle size={18} /> Từ chối (nhập lý do)
                             </button>
 
-                            <button
-                                onClick={() => setModal("lock")}
-                                style={{ display: "flex", alignItems: "center", gap: "0.65rem", padding: "0.85rem 1rem", background: "#f1f5f9", color: "#475569", border: "1px solid #e2e8f0", borderRadius: "0.6rem", fontWeight: 700, cursor: "pointer", fontSize: "0.9rem", transition: "all 0.15s" }}
-                                onMouseEnter={e => (e.currentTarget.style.background = "#e2e8f0")}
-                                onMouseLeave={e => (e.currentTarget.style.background = "#f1f5f9")}
-                            >
-                                <Lock size={18} /> Khóa tài khoản
-                            </button>
+                            {company.verification_status === "locked" ? (
+                                <button
+                                    onClick={() => unlock()}
+                                    style={{ display: "flex", alignItems: "center", gap: "0.65rem", padding: "0.85rem 1rem", background: "#dcfce7", color: "#15803d", border: "1px solid #bbf7d0", borderRadius: "0.6rem", fontWeight: 700, cursor: "pointer", fontSize: "0.9rem", transition: "all 0.15s" }}
+                                    onMouseEnter={e => (e.currentTarget.style.background = "#bbf7d0")}
+                                    onMouseLeave={e => (e.currentTarget.style.background = "#dcfce7")}
+                                >
+                                    <CheckCircle size={18} /> Mở khóa tài khoản
+                                </button>
+                            ) : (
+                                <button
+                                    onClick={() => setModal("lock")}
+                                    style={{ display: "flex", alignItems: "center", gap: "0.65rem", padding: "0.85rem 1rem", background: "#f1f5f9", color: "#475569", border: "1px solid #e2e8f0", borderRadius: "0.6rem", fontWeight: 700, cursor: "pointer", fontSize: "0.9rem", transition: "all 0.15s" }}
+                                    onMouseEnter={e => (e.currentTarget.style.background = "#e2e8f0")}
+                                    onMouseLeave={e => (e.currentTarget.style.background = "#f1f5f9")}
+                                >
+                                    <Lock size={18} /> Khóa tài khoản
+                                </button>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -270,6 +299,9 @@ export default function AdminCompanyVerifyPage() {
                             placeholder="Nhập lý do... (tùy chọn)"
                             value={reason}
                             onChange={(e) => setReason(e.target.value)}
+                            style={{
+                                color: "black"
+                            }}
                         />
                         <div className={styles.modalActions}>
                             <button className={cx(styles.btnSm, styles.gray)} onClick={() => { setModal(null); setReason(""); }}>Hủy</button>

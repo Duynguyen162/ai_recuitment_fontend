@@ -1,5 +1,5 @@
 export type ReportStatus  = "pending" | "resolved" | "dismissed";
-export type AdminAction   = "paused_job" | "closed_job" | "warned" | "no_action";
+export type AdminAction   = "closed_job" | "no_action";
 
 export interface JobReport {
   id: number;
@@ -45,25 +45,23 @@ export const STATUS_TABS: { key: "" | ReportStatus; label: string }[] = [
 /* ─── Admin action filter tabs (hiển thị khi tab status = resolved) ─── */
 export const ACTION_TABS: { key: "" | AdminAction; label: string }[] = [
   { key: "",           label: "Mọi hình thức" },
-  { key: "paused_job", label: "Tạm dừng tin" },
   { key: "closed_job", label: "Đóng & khóa" },
-  { key: "warned",     label: "Cảnh cáo" },
+//   { key: "warned",     label: "Cảnh cáo" },
   { key: "no_action",  label: "Không hành động" },
 ];
 
 /* ─── Hiển thị nhãn & badge cho admin_action ─── */
 export const ADMIN_ACTION_LABEL: Record<AdminAction, string> = {
-  paused_job: "Tạm dừng tin",
   closed_job: "Đóng & khóa vĩnh viễn",
-  warned:     "Cảnh cáo công ty",
+//   warned:     "Cảnh cáo công ty",
   no_action:  "Không hành động",
 };
 
 // Map sang tên class CSS đã có trong AdminLayout.module.scss
 export const ADMIN_ACTION_BADGE: Record<AdminAction, string> = {
-  paused_job: "flagged",   // cam
+//   paused_job: "flagged",   // cam
   closed_job: "rejected",  // đỏ
-  warned:     "info",      // xanh dương
+//   warned:     "info",      // xanh dương
   no_action:  "gray",      // xám
 };
 

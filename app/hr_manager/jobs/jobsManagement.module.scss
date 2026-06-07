@@ -319,6 +319,83 @@
     background: #fee2e2;
     color: #dc2626;
   }
+
+  &.lockedBadge {
+    border: 1.5px dashed currentColor;
+  }
+}
+
+/* ---------- Admin moderation badges ---------- */
+
+.adminWarningBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.35rem;
+  padding: 0.35rem 0.7rem;
+  border-radius: 0.5rem;
+  background: #fef3c7;
+  border: 1px solid #fcd34d;
+  color: #92400e;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.3;
+  animation: fadeIn 0.3s ease;
+}
+
+.adminDangerBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.35rem;
+  padding: 0.35rem 0.7rem;
+  border-radius: 0.5rem;
+  background: #fee2e2;
+  border: 1px solid #fca5a5;
+  color: #991b1b;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.3;
+  animation: fadeIn 0.3s ease;
+}
+
+.lockedRow {
+  background-color: #fffbeb !important;
+
+  &:hover {
+    background-color: #fef3c7 !important;
+  }
+}
+
+.contactAdmin {
+  color: #0369a1 !important;
+  font-weight: 600;
+
+  &:hover {
+    background: #e0f2fe !important;
+    color: #0c4a6e !important;
+  }
+}
+
+.lockedNotice {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  color: #9ca3af;
+  font-size: 0.8rem;
+  font-style: italic;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .statsCol {

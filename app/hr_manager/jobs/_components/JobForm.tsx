@@ -20,6 +20,7 @@ import TextareaField from "@/components/ui/TextareaField";
 import SkillTagInput from "@/components/ui/SkillTagInput";
 import Button from "@/components/ui/Button";
 import apiClient from "@/lib/apiClient";
+import { useCompanyProfile } from "@/hooks/useCompanyProfile";
 
 const jobFormSchema = z
   .object({
@@ -65,6 +66,8 @@ export default function JobForm({ mode, initialValues, jobId }: JobFormProps) {
   const [submitIntent, setSubmitIntent] = useState<"draft" | "publish">(
     "draft",
   );
+  const { company } = useCompanyProfile();
+  const isLocked = company.verification_status === "locked";
 
   const defaultValues = useMemo<JobFormValues>(
     () => ({
@@ -96,6 +99,10 @@ export default function JobForm({ mode, initialValues, jobId }: JobFormProps) {
     values: JobFormValues,
     intent: "draft" | "publish",
   ) => {
+    if (isLocked) {
+      toast.error("Tài khoản công ty của bạn đang bị khóa bởi Ban quản trị và không thể đăng bài tuyển dụng mới.");
+      return;
+    }
     const payload = {
       ...values,
       expired_at: new Date(values.expired_at).toISOString(),
@@ -115,7 +122,7 @@ export default function JobForm({ mode, initialValues, jobId }: JobFormProps) {
         router.push("/hr_manager/jobs");
         router.refresh();
       } catch {
-        toast.error("Không thể tạo job");
+        toast.error("Bạn cần không có quyền đăng bài");
       }
       return;
     }
@@ -295,8 +302,10 @@ export default function JobForm({ mode, initialValues, jobId }: JobFormProps) {
             </p>
             <div className={styles.inlineActionButtons}>
               <Button
-                type="button"
+                type="submit"
+                variant="primary"
                 loading={isSubmitting}
+                disabled={isLocked}
                 onClick={() => {
                   setSubmitIntent("publish");
                   void handleSubmit((data) => onSubmit(data, "publish"))();
@@ -308,6 +317,7 @@ export default function JobForm({ mode, initialValues, jobId }: JobFormProps) {
                 type="button"
                 variant="outline"
                 loading={isSubmitting}
+                disabled={isLocked}
                 onClick={() => {
                   setSubmitIntent("draft");
                   void handleSubmit((data) => onSubmit(data, "draft"))();

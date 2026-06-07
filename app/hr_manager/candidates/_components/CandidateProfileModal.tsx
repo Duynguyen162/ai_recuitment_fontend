@@ -9,10 +9,8 @@ import apiClient from "@/lib/apiClient";
 import styles from "../candidates.module.scss";
 
 interface Experience {
-    company: string;
-    position: string;
-    start_date: string;
-    end_date?: string;
+    company_name: string;
+    job_title: string;
     description?: string;
 }
 interface Education {
@@ -160,10 +158,8 @@ export default function CandidateProfileModal({
                                     <Section icon={<Briefcase size={16} />} title="Kinh nghiệm làm việc">
                                         {profile.experiences.map((exp, i) => (
                                             <div key={i} style={{ marginBottom: "1rem", paddingLeft: "0.75rem", borderLeft: "2px solid #e2e8f0" }}>
-                                                <div style={{ fontWeight: 700, color: "#1e293b", fontSize: "0.9rem" }}>{exp.position}</div>
-                                                <div style={{ color: "#3b82f6", fontSize: "0.85rem", fontWeight: 600 }}>{exp.company}</div>
-                                                <div style={{ color: "#94a3b8", fontSize: "0.8rem", marginTop: "0.15rem" }}>
-                                                    {exp.start_date} – {exp.end_date || "Hiện tại"}
+                                                <div style={{ color: "#000000ff", fontWeight: 600, fontSize: "0.8rem", marginTop: "0.15rem" }}>
+                                                    {exp.job_title} - {exp.company_name}
                                                 </div>
                                                 {exp.description && (
                                                     <div style={{ marginTop: "0.4rem", fontSize: "0.85rem", color: "#475569", lineHeight: 1.5 }}>{exp.description}</div>

@@ -261,12 +261,12 @@ export default function AdminCandidatesPage() {
               placeholder="Tìm theo tên, email..."
               value={keywordInput}
               onChange={(e) => setKeywordInput(e.target.value)}
-              style={{ padding: "0.4rem 0.75rem", border: "1px solid #e2e8f0", borderRadius: "0.4rem", fontSize: "0.85rem", outline: "none", minWidth: 200 }}
+              style={{ padding: "0.4rem 0.75rem",color: "black", border: "1px solid #e2e8f0", borderRadius: "0.4rem", fontSize: "0.85rem", outline: "none", minWidth: 200 }}
             />
             <select
               value={statusFilter}
               onChange={(e) => handleStatusFilter(e.target.value as "" | "active" | "banned")}
-              style={{ padding: "0.4rem 0.6rem", border: "1px solid #e2e8f0", borderRadius: "0.4rem", fontSize: "0.85rem", outline: "none", color: "#334155", background: "#f8fafc" }}
+              style={{ padding: "0.4rem 0.6rem",border: "1px solid #e2e8f0", borderRadius: "0.4rem", fontSize: "0.85rem", outline: "none", color: "#334155", background: "#f8fafc" }}
             >
               <option value="">Tất cả trạng thái</option>
               <option value="active">Đang hoạt động</option>

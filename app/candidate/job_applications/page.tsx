@@ -135,7 +135,7 @@ export default function ApplicationsPage() {
 
     const handlePreviewCV = async (cvUrl: string) => {
         if (!cvUrl) {
-            toast.error("Không có file để xem");
+            toast.error("CV là Hồ sơ của bạn");
             return;
         }
         try {
@@ -249,7 +249,7 @@ export default function ApplicationsPage() {
                                                 className={styles.cvLink}
                                                 onClick={() => handlePreviewCV(app.cv_url)}
                                             >
-                                                {app.cv_name}
+                                                {app.cv_name == "Không có CV" ? "CV là hồ sơ" : app.cv_name}
                                             </span>
                                         </div>
                                     </div>

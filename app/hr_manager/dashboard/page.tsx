@@ -51,7 +51,7 @@ export default function HRDashboard() {
         
       } catch (error) {
         console.error("Lỗi khi lấy dữ liệu dashboard:", error);
-        toast.error("Không thể tải bảng điều khiển.");
+        //toast.error("Không thể tải bảng điều khiển.");
       } finally {
         setLoading(false);
       }
