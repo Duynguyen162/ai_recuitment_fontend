@@ -12,6 +12,7 @@ import {
   Menu,
   Shield,
   Users,
+  CreditCard,
 } from "lucide-react";
 import cx from "classnames";
 import { useLogout } from "@/hooks/useLogout";
@@ -28,6 +29,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { name: "Kiểm duyệt Job", path: "/admin/jobs", icon: Briefcase },
     { name: "Ứng viên", path: "/admin/candidates", icon: Users },
     { name: "AI Monitoring", path: "/admin/ai-monitoring", icon: Bot },
+    { name: "Gói dịch vụ VIP", path: "/admin/subscription-plans", icon: CreditCard },
   ];
 
   const pageTitle = menuItems.find((m) => pathname.startsWith(m.path))?.name ?? "Admin";

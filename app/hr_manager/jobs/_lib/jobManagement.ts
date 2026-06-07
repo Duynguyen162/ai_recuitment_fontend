@@ -44,6 +44,7 @@ export interface HrJob {
   job_type: JobType;
   expired_at: string;
   status: Exclude<JobStatus, "all">;
+  locked_by_admin: boolean;
   created_at: string;
   company?: CompanyInfo;
 }

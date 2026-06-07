@@ -66,16 +66,15 @@ export default function AdminJobsPage() {
     fetchReports();
   };
 
-  // Backend: { action: "allow" | "pause" | "close" } — AdminJobActionEnum
-  const jobAction = async (jobId: number, action: "allow" | "pause" | "close") => {
+  const jobAction = async (jobId: number, action: "allow" | "close") => {
     await apiClient.post(`/admin/jobs/${jobId}/action`, { action });
-    const msg = { allow: "Đã mở lại tin.", pause: "Đã tạm dừng tin.", close: "Đã đóng & khóa tin." };
+    const msg = { allow: "Đã mở lại tin.",close: "Đã đóng & khóa tin." };
     toast.success(msg[action]);
   };
 
   const handleStatusFilter = (s: typeof statusFilter) => {
     setStatusFilter(s);
-    setActionFilter(""); // reset action filter khi đổi tab status
+    setActionFilter(""); 
     setPage(1);
   };
 

@@ -190,7 +190,8 @@ export default function JobApplicantsPage() {
                 setTotalApplicants(response.data?.total || normalizedApplicants.length);
             } catch (error: any) {
                 if (error.response?.status === 404) {
-                    toast.error("Vui lòng cập nhật API backend: thêm endpoint lấy ứng viên có phân trang");
+                    // toast.error("Vui lòng cập nhật API backend: thêm endpoint lấy ứng viên có phân trang");
+                    console.log("Lỗi: ", error.response?.data);
                 } else {
                     toast.error("Không thể tải danh sách ứng viên");
                 }
@@ -285,7 +286,7 @@ export default function JobApplicantsPage() {
             active = false;
             clearTimeout(startTimer);
         };
-    // Chỉ khởi động lại khi người dùng chuyển trang/job/filter — KHÔNG phụ thuộc vào applicants state
+        // Chỉ khởi động lại khi người dùng chuyển trang/job/filter — KHÔNG phụ thuộc vào applicants state
     }, [selectedJobId, activeTab, page, deferredSearchQuery, requeueTrigger]);
 
     const selectedJob = useMemo(
@@ -316,7 +317,7 @@ export default function JobApplicantsPage() {
     const updateApplicantState = (
         applicantId: string,
         updates: Partial<Applicant>,
-        successMessage: string,
+        successMessage?: string,
     ) => {
 
         setApplicants((prev) =>

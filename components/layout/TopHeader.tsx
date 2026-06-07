@@ -51,7 +51,7 @@ export default function TopHeader({
     };
 
     useEffect(() => {
-        if (role === 'candidate') {
+        if (role === 'candidate' || role === 'hr') {
             const fetchNotifications = async () => {
                 try {
                     const res = await apiClient.get('/notifications/my');
@@ -67,7 +67,7 @@ export default function TopHeader({
 
     const handleReadNotification = async (id: number) => {
         try {
-            await apiClient.put(`/notifications/${id}/read`);
+            await apiClient.patch(`/notifications/${id}/read`);
             setNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: true } : n));
             setUnreadCount(prev => Math.max(0, prev - 1));
         } catch (err) {
@@ -77,7 +77,7 @@ export default function TopHeader({
 
     const handleReadAll = async () => {
         try {
-            await apiClient.put(`/notifications/read-all`);
+            await apiClient.patch(`/notifications/read-all`);
             setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
             setUnreadCount(0);
         } catch (err) {
@@ -118,7 +118,7 @@ export default function TopHeader({
             </div>
 
             <div className={styles.rightSection}>
-                {role === "candidate" ? (
+                {(role === "candidate" || role === "hr") ? (
                     <div className={styles.notificationWrapper} ref={notifRef}>
                         <button className={styles.notificationBtn} onClick={() => setNotifOpen(!notifOpen)}>
                             <Bell size={20} />
@@ -145,7 +145,7 @@ export default function TopHeader({
                                                 }}
                                             >
                                                 <div className={styles.notifTitle}>{n.title}</div>
-                                                <div className={styles.notifMsg}>{n.message}</div>
+                                                <div className={styles.notifMsg}>{n.body}</div>
                                                 <div className={styles.notifTime}>{new Date(n.created_at).toLocaleString('vi-VN')}</div>
                                             </div>
                                         ))
