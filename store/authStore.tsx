@@ -7,6 +7,7 @@ interface User {
     email: string;
     role: "candidate" | "hr_manager" | "admin";
     name?: string;
+    avatar?: string;
 }
 
 interface AuthState {

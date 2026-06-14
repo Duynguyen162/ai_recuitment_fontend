@@ -9,7 +9,7 @@ import { useAuthStore } from "@/store/authStore";
 
 import InputField from "../../../components/ui/InputField";
 import Button from "../../../components/ui/Button";
-import SocialLogin from "../components/SocialLogin";
+// import SocialLogin from "../components/SocialLogin";
 import styles from "./login.module.scss";
 import axios from "axios";
 
@@ -108,7 +108,7 @@ export default function LoginForm({ redirectUrl }: LoginFormProps) {
                     Đăng nhập
                 </Button>
             </form>
-            <SocialLogin />
+            {/* <SocialLogin /> */}
             <p className={styles.authLink}>
                 Chưa có tài khoản? <Link href="/auth/register">Đăng ký ngay</Link>
             </p>

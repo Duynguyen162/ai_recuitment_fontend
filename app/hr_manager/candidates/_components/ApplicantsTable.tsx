@@ -16,6 +16,12 @@ import {
 import { Applicant, AppStatus, CandidatesTab } from "../_lib/types";
 import styles from "../candidates.module.scss";
 
+function getAvatarUrl(url: string | null | undefined) {
+    if (!url) return undefined;
+    if (url.startsWith("http") || url.startsWith("/")) return url;
+    return `/${url}`;
+}
+
 interface ApplicantsTableProps {
     applicants: Applicant[];
     jobsLoading: boolean;
@@ -115,8 +121,12 @@ export default function ApplicantsTable({
                                 <tr key={app.id}>
                                     <td>
                                         <div className={styles.candidateInfo}>
-                                            <div className={styles.avatar}>
-                                                {app.candidate_name.charAt(0)}
+                                            <div className={styles.avatar} style={app.avatar_url ? { padding: 0, overflow: "hidden" } : {}}>
+                                                {app.avatar_url ? (
+                                                    <img src={getAvatarUrl(app.avatar_url)} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                                                ) : (
+                                                    app.candidate_name.charAt(0).toUpperCase()
+                                                )}
                                             </div>
                                             <div>
                                                 <div className={styles.name}>{app.candidate_name}</div>

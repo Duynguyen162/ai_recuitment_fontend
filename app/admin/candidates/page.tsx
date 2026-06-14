@@ -50,6 +50,12 @@ function formatDate(d: string) {
   return new Date(d).toLocaleDateString("vi-VN");
 }
 
+function getAvatarUrl(url: string | null | undefined) {
+  if (!url) return undefined;
+  if (url.startsWith("http") || url.startsWith("/")) return url;
+  return `/${url}`;
+}
+
 /* ─── Candidate Detail Popup ─── */
 function CandidateDetailPopup({
   candidate,
@@ -93,7 +99,7 @@ function CandidateDetailPopup({
           <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "0.25rem" }}>
             <div style={{ width: 52, height: 52, borderRadius: "50%", background: isBanned ? "#fee2e2" : "#dbeafe", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, overflow: "hidden" }}>
               {candidate.avatar_url
-                ? <img src={candidate.avatar_url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                ? <img src={getAvatarUrl(candidate.avatar_url)} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                 : <User size={24} color={isBanned ? "#dc2626" : "#1d4ed8"} />}
             </div>
             <div>
@@ -305,7 +311,7 @@ export default function AdminCandidatesPage() {
                     <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
                       <div style={{ width: 28, height: 28, borderRadius: "50%", background: c.status === "banned" ? "#fee2e2" : "#dbeafe", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, overflow: "hidden" }}>
                         {c.avatar_url
-                          ? <img src={c.avatar_url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                          ? <img src={getAvatarUrl(c.avatar_url)} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                           : <User size={13} color={c.status === "banned" ? "#dc2626" : "#1d4ed8"} />}
                       </div>
                       <span style={{ fontWeight: 600, color: "#0f172a" }}>{c.full_name ?? "(Chưa cập nhật)"}</span>

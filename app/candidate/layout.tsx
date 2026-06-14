@@ -38,7 +38,7 @@ export default function CandidateLayout({
                 className={`${styles.mainArea} ${!isSidebarOpen ? styles.collapsed : ""
                     }`}
             >
-                <TopHeader role="candidate" userName={user?.name || ""} />
+                <TopHeader role="candidate" userName={user?.name || ""} avatarUrl={user?.avatar || ""} />
 
                 <main className={styles.contentArea}>{children}</main>
             </div>
