@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import AuthLayout from "../components/AuthLayout";
 import InputField from "../../../components/ui/InputField";
 import Button from "../../../components/ui/Button";
@@ -9,7 +9,7 @@ import styles from "./reset-password.module.scss";
 import axios from "axios";
 import { useSearchParams } from "next/navigation";
 
-export default function ResetPasswordPage() {
+function ResetPasswordContent() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -26,7 +26,7 @@ export default function ResetPasswordPage() {
     confirmPassword.length >= 6 &&
     password === confirmPassword;
 
-  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!isValid) return;
 
@@ -102,5 +102,13 @@ export default function ResetPasswordPage() {
         </p>
       )}
     </AuthLayout>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={<div>Đang tải...</div>}>
+      <ResetPasswordContent />
+    </Suspense>
   );
 }
