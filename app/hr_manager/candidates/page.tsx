@@ -7,6 +7,7 @@ import React, {
     useMemo,
     useState,
     useRef,
+    Suspense,
 } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -46,7 +47,7 @@ import {
 } from "./_lib/types";
 import styles from "./candidates.module.scss";
 
-export default function JobApplicantsPage() {
+function JobApplicantsContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const initialJobIdRef = useRef(searchParams.get("jobId"));
@@ -719,5 +720,13 @@ export default function JobApplicantsPage() {
                 isDestructive={confirmingAction?.nextStatus === "rejected"}
             />
         </>
+    );
+}
+
+export default function JobApplicantsPage() {
+    return (
+        <Suspense fallback={<div>Đang tải thông tin ứng viên...</div>}>
+            <JobApplicantsContent />
+        </Suspense>
     );
 }

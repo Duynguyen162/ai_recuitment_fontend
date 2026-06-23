@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, Suspense } from "react";
 import Link from "next/link";
 import cx from "classnames";
 import { Eye, CheckCircle, XCircle, Lock } from "lucide-react";
@@ -34,7 +34,7 @@ const STATUS_LABELS: Record<string, string> = {
     rejected: "Từ chối", locked: "Bị khóa",
 };
 
-export default function AdminCompaniesPage() {
+function AdminCompaniesContent() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const initialTab = (searchParams.get("status") ?? "all") as VerifyStatus;
@@ -232,5 +232,13 @@ export default function AdminCompaniesPage() {
                 </div>
             )}
         </div>
+    );
+}
+
+export default function AdminCompaniesPage() {
+    return (
+        <Suspense fallback={<div>Đang tải thông tin...</div>}>
+            <AdminCompaniesContent />
+        </Suspense>
     );
 }
