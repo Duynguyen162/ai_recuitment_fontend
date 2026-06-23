@@ -8,6 +8,12 @@ import {
 import apiClient from "@/lib/apiClient";
 import styles from "../candidates.module.scss";
 
+function getAvatarUrl(url: string | null | undefined) {
+    if (!url) return undefined;
+    if (url.startsWith("http") || url.startsWith("/")) return url;
+    return `/${url}`;
+}
+
 interface Experience {
     company_name: string;
     job_title: string;
@@ -37,6 +43,7 @@ interface ProfileData {
     educations?: Education[];
     certifications?: Certification[];
     skills?: string[];
+    avatar_url?: string;
 }
 
 interface CandidateProfileModalProps {
@@ -97,8 +104,12 @@ export default function CandidateProfileModal({
                     {/* Header */}
                     <div className={styles.modalHeader}>
                         <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-                            <div style={{ width: 48, height: 48, borderRadius: "50%", background: "linear-gradient(135deg, #3b82f6, #8b5cf6)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700, fontSize: "1.25rem", flexShrink: 0 }}>
-                                {name.charAt(0).toUpperCase()}
+                            <div style={{ width: 48, height: 48, borderRadius: "50%", background: "linear-gradient(135deg, #3b82f6, #8b5cf6)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700, fontSize: "1.25rem", flexShrink: 0, overflow: "hidden" }}>
+                                {profile?.avatar_url ? (
+                                    <img src={getAvatarUrl(profile.avatar_url)} alt={name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                                ) : (
+                                    name.charAt(0).toUpperCase()
+                                )}
                             </div>
                             <div>
                                 <h3 style={{ margin: 0 }}>Hồ sơ trực tuyến</h3>

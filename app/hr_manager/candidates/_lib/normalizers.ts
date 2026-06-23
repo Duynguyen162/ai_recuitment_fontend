@@ -161,9 +161,10 @@ export function normalizeApplicant(item: unknown): Applicant | null {
     cv_type: (source.cv_type === "profile" || source.cv_type === "uploaded_cv") 
       ? source.cv_type 
       : (source.cv_id ? "uploaded_cv" : "profile"),
-    ai_status: (["not_queued","queued","processing","done","failed","dead"].includes(source.ai_status))
-      ? source.ai_status
+    ai_status: (["not_queued","queued","processing","done","failed","dead"].includes(source.ai_status as string))
+      ? source.ai_status as Applicant["ai_status"]
       : (Number(source.ai_score ?? source.match_score ?? 0) > 0 ? "done" : "pending"),
     candidate_id: source.candidate_id ? Number(source.candidate_id) : undefined,
+    avatar_url: typeof source.avatar_url === "string" ? source.avatar_url : null,
   };
 }

@@ -12,6 +12,8 @@ import InputField from "@/components/ui/InputField";
 import SkillTagInput from "@/components/ui/SkillTagInput";
 import apiClient from "@/lib/apiClient";
 import TextareaField from "@/components/ui/TextareaField";
+import AvatarUpload from "./AvatarUpload";
+import { useAuthStore } from "@/store/authStore";
 
 const basicInfoSchema = z.object({
   full_name: z.string().min(2, "Vui lòng nhập họ và tên"),
@@ -67,6 +69,8 @@ export default function BasicInfoForm({ refreshTrigger }: { refreshTrigger?: num
   });
 
   const [isLoading, setIsLoading] = useState(true);
+  const [avatarUrl, setAvatarUrl] = useState("");
+  const { user, login } = useAuthStore();
 
   useEffect(() => {
     const profileData = async () => {
@@ -74,6 +78,7 @@ export default function BasicInfoForm({ refreshTrigger }: { refreshTrigger?: num
       try {
         const res = await apiClient.get("/profiles/profileCandidate");
         const data = res.data.data;
+        setAvatarUrl(data.avatar_url || "");
         reset({
           full_name: data.full_name || "",
           phone: data.phone || "",
@@ -128,6 +133,17 @@ export default function BasicInfoForm({ refreshTrigger }: { refreshTrigger?: num
     <div className={cx(styles.formWrapper, { [styles.isLoading]: isLoading })} style={{ position: 'relative' }}>
       {isLoading && <div className={styles.topLoader}></div>}
       <h3>Thông tin cốt lõi</h3>
+      {!isLoading && (
+        <AvatarUpload 
+          initialAvatarUrl={avatarUrl} 
+          onUploadSuccess={(url) => {
+            setAvatarUrl(url);
+            if (user) {
+              login({ ...user, avatar: url });
+            }
+          }} 
+        />
+      )}
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className={styles.inputGrid}>
           <InputField

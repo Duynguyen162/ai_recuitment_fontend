@@ -45,6 +45,7 @@ export interface Applicant {
   cv_type?: "profile" | "uploaded_cv";
   ai_status?: "not_queued" | "queued" | "processing" | "done" | "failed" | "dead" | "pending";
   candidate_id?: number;
+  avatar_url?: string | null;
 }
 
 export interface InterviewScheduleFormValues {
@@ -62,6 +63,7 @@ export interface CandidateProfileData {
   address?: string;
   date_of_birth?: string;
   summary?: string;
+  avatar_url?: string | null;
   experiences?: Array<{
     company: string;
     position: string;
