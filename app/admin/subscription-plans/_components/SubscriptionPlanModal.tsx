@@ -14,6 +14,7 @@ interface SubscriptionPlanModalProps {
         cycle: "monthly" | "yearly";
         price_vnd: number;
         vip_duration_days: number;
+        daily_ai_token_limit: number;
         is_active: boolean;
     }) => Promise<void>;
     isSubmitting: boolean;
@@ -32,6 +33,7 @@ export default function SubscriptionPlanModal({
     const [cycle, setCycle] = useState<"monthly" | "yearly">("monthly");
     const [priceVnd, setPriceVnd] = useState<number | string>("");
     const [vipDurationDays, setVipDurationDays] = useState<number | string>(30);
+    const [dailyAiTokenLimit, setDailyAiTokenLimit] = useState<number | string>("");
     const [isActive, setIsActive] = useState(true);
 
     // Client Validation Errors State
@@ -46,6 +48,7 @@ export default function SubscriptionPlanModal({
                 setCycle(editingPlan.cycle);
                 setPriceVnd(editingPlan.price_vnd);
                 setVipDurationDays(editingPlan.vip_duration_days);
+                setDailyAiTokenLimit(editingPlan.daily_ai_token_limit);
                 setIsActive(editingPlan.is_active);
             } else {
                 setCode("");
@@ -53,6 +56,7 @@ export default function SubscriptionPlanModal({
                 setCycle("monthly");
                 setPriceVnd("");
                 setVipDurationDays(30);
+                setDailyAiTokenLimit("");
                 setIsActive(true);
             }
             setValidationErrors({});
@@ -91,6 +95,11 @@ export default function SubscriptionPlanModal({
                 errors.vipDurationDays = "Thời gian VIP phải là số nguyên dương ngày.";
             }
 
+            const aiLimit = Number(dailyAiTokenLimit);
+            if (dailyAiTokenLimit === "" || isNaN(aiLimit) || aiLimit < 0 || !Number.isInteger(aiLimit)) {
+                errors.dailyAiTokenLimit = "Giới hạn AI Token phải là số nguyên >= 0.";
+            }
+
             if (cycle !== "monthly" && cycle !== "yearly") {
                 errors.cycle = "Chu kỳ chỉ được phép chọn theo tháng hoặc theo năm.";
             }
@@ -110,6 +119,7 @@ export default function SubscriptionPlanModal({
             cycle,
             price_vnd: Number(priceVnd),
             vip_duration_days: Number(vipDurationDays),
+            daily_ai_token_limit: Number(dailyAiTokenLimit),
             is_active: isActive,
         });
     };
@@ -271,6 +281,36 @@ export default function SubscriptionPlanModal({
                         {validationErrors.priceVnd && (
                             <p style={{ color: "#ef4444", fontSize: "0.75rem", marginTop: "0.25rem", display: "flex", alignItems: "center", gap: "0.25rem" }}>
                                 <AlertCircle size={12} /> {validationErrors.priceVnd}
+                            </p>
+                        )}
+                    </div>
+
+                    {/* Daily AI Token Limit */}
+                    <div>
+                        <label style={{ display: "block", fontSize: "0.825rem", fontWeight: 600, color: "#334155", marginBottom: "0.25rem" }}>
+                            Giới hạn AI Token / Ngày *
+                        </label>
+                        <input
+                            type="number"
+                            placeholder="Ví dụ: 10000"
+                            value={dailyAiTokenLimit}
+                            onChange={(e) => setDailyAiTokenLimit(e.target.value)}
+                            disabled={!!editingPlan}
+                            style={{
+                                width: "100%",
+                                padding: "0.6rem 0.75rem",
+                                color: editingPlan ? "#64748b" : "#0f172a",
+                                border: "1px solid #e2e8f0",
+                                borderRadius: "0.5rem",
+                                fontSize: "0.875rem",
+                                outline: "none",
+                                background: editingPlan ? "#f1f5f9" : "#fff",
+                                cursor: editingPlan ? "not-allowed" : "text",
+                            }}
+                        />
+                        {validationErrors.dailyAiTokenLimit && (
+                            <p style={{ color: "#ef4444", fontSize: "0.75rem", marginTop: "0.25rem", display: "flex", alignItems: "center", gap: "0.25rem" }}>
+                                <AlertCircle size={12} /> {validationErrors.dailyAiTokenLimit}
                             </p>
                         )}
                     </div>

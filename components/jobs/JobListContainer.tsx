@@ -25,7 +25,7 @@ export default function JobsPage() {
     const [searchQuery, setSearchQuery] = useState("");
     const [page, setPage] = useState(1);
     const [total, setTotal] = useState(0);
-    const limit = 10;
+    const limit = 12;
     const [loading, setLoading] = useState(false);
     const [jobResults, setJobResults] = useState<any[]>([]);
 

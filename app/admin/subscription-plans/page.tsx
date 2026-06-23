@@ -82,6 +82,7 @@ export default function AdminSubscriptionPlansPage() {
         cycle: "monthly" | "yearly";
         price_vnd: number;
         vip_duration_days: number;
+        daily_ai_token_limit: number;
         is_active: boolean;
     }) => {
         setIsSubmitting(true);

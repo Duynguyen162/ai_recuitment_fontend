@@ -51,12 +51,12 @@ export default function AdminJobsPage() {
    * Body: { status, admin_action, admin_note? }
    */
   const resolveReport = async (
-    reportId: number,
+    jobId: number,
     status: "resolved" | "dismissed",
     adminAction: AdminAction,
     adminNote?: string,
   ) => {
-    await apiClient.put(`/admin/job-reports/${reportId}/resolve`, {
+    await apiClient.put(`/admin/job-reports/${jobId}/resolve`, {
       status,
       admin_action: adminAction,
       admin_note: adminNote,
@@ -139,7 +139,6 @@ export default function AdminJobsPage() {
       {selectedReport && (
         <JobDetailPopup
           jobId={selectedReport.job_id}
-          reportId={selectedReport.id}
           reportStatus={selectedReport.status}
           onClose={() => setSelectedReport(null)}
           onReportAction={resolveReport}

@@ -112,6 +112,16 @@ export default function JobPreviewModal({
             </div>
             <p>{job.requirements}</p>
           </section>
+
+          {job.benefits && (
+            <section className={styles.previewSection}>
+              <div className={styles.previewSectionTitle}>
+                <FileText size={16} />
+                Quyền lợi
+              </div>
+              <p>{job.benefits}</p>
+            </section>
+          )}
         </div>
 
         <div className={styles.modalFooter}>

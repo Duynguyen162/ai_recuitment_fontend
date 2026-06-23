@@ -29,6 +29,17 @@ apiClient.interceptors.response.use(
       } 
     }
 
+    if (status === 429) {
+      if (typeof window !== "undefined") {
+        const toast = require("react-hot-toast").default;
+        const detailMessage = error.response?.data?.detail || "Bạn đã vượt quá giới hạn sử dụng AI hôm nay. Hạn mức sẽ được làm mới vào ngày mai.";
+        toast.error(detailMessage, {
+          duration: 5000,
+          position: "top-center"
+        });
+      }
+    }
+
     return Promise.reject(error);
   }
 );

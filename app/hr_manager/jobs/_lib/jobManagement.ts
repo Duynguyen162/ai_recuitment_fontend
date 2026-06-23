@@ -36,6 +36,7 @@ export interface HrJob {
   title: string;
   description: string;
   requirements: string;
+  benefits?: string;
   location: string;
   tags: string[];
   salary_min: number;
