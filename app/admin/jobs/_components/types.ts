@@ -2,12 +2,11 @@ export type ReportStatus  = "pending" | "resolved" | "dismissed";
 export type AdminAction   = "closed_job" | "no_action";
 
 export interface JobReport {
-  id: number;
   job_id: number;
   job_title: string;
   company_name: string;
-  reporter_email: string;
-  reason: string;
+  report_count: number;
+  reasons: string[];
   status: ReportStatus;
   admin_action: AdminAction | null;
   admin_note: string | null;

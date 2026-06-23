@@ -27,6 +27,13 @@ interface DashboardStats {
     application_by_status?: Record<string, number>;
 }
 
+interface TopAiUser {
+    user_id: number;
+    email: string;
+    role: string;
+    tokens_used: number;
+}
+
 // ─── Simple bar renderer (no external lib needed) ────────
 function MiniBar({ label, value, max, color }: { label: string; value: number; max: number; color: string }) {
     const pct = max > 0 ? Math.round((value / max) * 100) : 0;
@@ -48,6 +55,7 @@ export default function AdminDashboard() {
     const [loading, setLoading] = useState(true);
     const [chartDays, setChartDays] = useState<7 | 30 | 90>(7);
     const [chartData, setChartData] = useState<{ date: string; count: number }[]>([]);
+    const [topAiUsers, setTopAiUsers] = useState<TopAiUser[]>([]);
 
     useEffect(() => {
         const load = async () => {
@@ -60,7 +68,14 @@ export default function AdminDashboard() {
                 setLoading(false);
             }
         };
+        const loadTopUsers = async () => {
+            try {
+                const res = await apiClient.get("/admin/dashboard/ai-quotas/top-users?limit=5");
+                if (res.data?.success) setTopAiUsers(res.data.data);
+            } catch { /* silent */ }
+        };
         load();
+        loadTopUsers();
     }, []);
 
     useEffect(() => {
@@ -227,6 +242,49 @@ export default function AdminDashboard() {
                                     <ChevronRight size={16} color="#94a3b8" />
                                 </div>
                             </Link>
+                        </div>
+                    </div>
+
+                    {/* Top AI Users */}
+                    <div className={styles.card}>
+                        <div className={styles.cardHeader}><h3>Top Sử dụng AI Hôm Nay</h3></div>
+                        <div style={{ padding: "0" }}>
+                            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                                <thead>
+                                    <tr style={{ borderBottom: "1px solid #f1f5f9", background: "#f8fafc", textAlign: "left", fontSize: "0.8rem", color: "#64748b" }}>
+                                        <th style={{ padding: "0.75rem 1rem", fontWeight: 600 }}>Email</th>
+                                        <th style={{ padding: "0.75rem 1rem", fontWeight: 600 }}>Vai trò</th>
+                                        <th style={{ padding: "0.75rem 1rem", fontWeight: 600, textAlign: "right" }}>Token dùng</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {topAiUsers.length > 0 ? topAiUsers.map((u, i) => (
+                                        <tr key={i} style={{ borderBottom: "1px solid #f1f5f9" }}>
+                                            <td style={{ padding: "0.75rem 1rem", fontSize: "0.85rem", color: "#0f172a", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "150px" }} title={u.email}>
+                                                {u.email}
+                                            </td>
+                                            <td style={{ padding: "0.75rem 1rem" }}>
+                                                <span style={{
+                                                    fontSize: "0.7rem", fontWeight: 600, padding: "0.2rem 0.5rem", borderRadius: "4px",
+                                                    backgroundColor: u.role === "candidate" ? "#f3e8ff" : "#e0f2fe",
+                                                    color: u.role === "candidate" ? "#9333ea" : "#0284c7"
+                                                }}>
+                                                    {u.role}
+                                                </span>
+                                            </td>
+                                            <td style={{ padding: "0.75rem 1rem", fontSize: "0.85rem", fontWeight: 600, textAlign: "right", color: "#334155" }}>
+                                                {u.tokens_used.toLocaleString()}
+                                            </td>
+                                        </tr>
+                                    )) : (
+                                        <tr>
+                                            <td colSpan={3} style={{ padding: "1.5rem", textAlign: "center", fontSize: "0.85rem", color: "#64748b" }}>
+                                                Chưa có dữ liệu hôm nay.
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>

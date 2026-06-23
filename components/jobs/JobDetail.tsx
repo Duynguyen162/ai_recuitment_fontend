@@ -41,6 +41,7 @@ interface JobData {
     title: string;
     description: string;
     requirements: string;
+    benefits?: string;
     location: string;
     salary_min: number;
     salary_max: number;
@@ -63,7 +64,7 @@ export default function JobDetailPage() {
     const [error, setError] = useState("");
     const searchParams = useSearchParams();
     const id = searchParams.get("id");
-    const [activeTab, setActiveTab] = useState<"desc" | "req">("desc");
+    const [activeTab, setActiveTab] = useState<"desc" | "req" | "benefits">("desc");
 
     // Trạng thái (Thường lấy từ backend sau khi user đăng nhập)
     const [hasApplied, setHasApplied] = useState(false);
@@ -231,9 +232,13 @@ export default function JobDetailPage() {
                         </div>
 
                         <div className={styles.tagsRow}>
+                            <span className={styles.tagLabel}>Hình thức:</span>
                             <span className={styles.tagType}>
                                 {job.job_type === "full_time" ? "Toàn thời gian" : job.job_type}
                             </span>
+                        </div>
+                        <div className={styles.tagsRow} style={{ marginTop: '0.75rem' }}>
+                            <span className={styles.tagLabel}>Kỹ năng:</span>
                             {job.tags.map((tag) => (
                                 <span key={tag} className={styles.tagSkill}>
                                     {tag}
@@ -260,6 +265,14 @@ export default function JobDetailPage() {
                             >
                                 Yêu cầu ứng viên
                             </button>
+                            <button
+                                className={cx(styles.tabBtn, {
+                                    [styles.active]: activeTab === "benefits",
+                                })}
+                                onClick={() => setActiveTab("benefits")}
+                            >
+                                Quyền lợi
+                            </button>
                         </div>
 
                         <div className={styles.tabContent}>
@@ -268,6 +281,9 @@ export default function JobDetailPage() {
                             )}
                             {activeTab === "req" && (
                                 <div dangerouslySetInnerHTML={{ __html: job.requirements }} />
+                            )}
+                            {activeTab === "benefits" && job.benefits && (
+                                <div dangerouslySetInnerHTML={{ __html: job.benefits }} />
                             )}
                         </div>
                     </div>

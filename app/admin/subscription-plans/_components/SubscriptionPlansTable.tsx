@@ -29,6 +29,7 @@ export default function SubscriptionPlansTable({
                             <th>Tên hiển thị</th>
                             <th>Giá dịch vụ (VND)</th>
                             <th>Hạn VIP (Ngày)</th>
+                            <th>Giới hạn AI (Token/Ngày)</th>
                             <th>Trạng thái hoạt động</th>
                             <th style={{ textAlign: "right" }}>Thao tác</th>
                         </tr>
@@ -57,6 +58,9 @@ export default function SubscriptionPlansTable({
                                         {formatCurrency(plan.price_vnd)}
                                     </td>
                                     <td>{plan.vip_duration_days} ngày</td>
+                                    <td style={{ fontWeight: 600, color: "#8b5cf6" }}>
+                                        {plan.daily_ai_token_limit ? plan.daily_ai_token_limit.toLocaleString() : "Không có"}
+                                    </td>
                                     <td>
                                         <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
                                             <label className={styles.toggleSwitch}>

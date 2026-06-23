@@ -16,11 +16,10 @@ import { JobDetail, AdminAction, formatSalary, formatDate } from "./types";
 /* ─── Props ─── */
 interface Props {
   jobId: number;
-  reportId: number;
   reportStatus: "pending" | "resolved" | "dismissed";
   onClose: () => void;
   onReportAction: (
-    reportId: number,
+    jobId: number,
     status: "resolved" | "dismissed",
     adminAction: AdminAction,
   ) => Promise<void>;
@@ -28,7 +27,7 @@ interface Props {
 }
 
 export default function JobDetailPopup({
-  jobId, reportId, reportStatus, onClose, onReportAction, onJobAction,
+  jobId, reportStatus, onClose, onReportAction, onJobAction,
 }: Props) {
   const [job, setJob] = useState<JobDetail | null>(null);
   const [loading, setLoading] = useState(true);
@@ -73,7 +72,7 @@ export default function JobDetailPopup({
         const actionMap: Record<"close", AdminAction> = {
           close: "closed_job",
         };
-        await onReportAction(reportId, "resolved", actionMap[action]);
+        await onReportAction(jobId, "resolved", actionMap[action]);
         return; 
       }
       onClose();
@@ -194,7 +193,7 @@ export default function JobDetailPopup({
                     <button
                       className={cx(adminStyles.btnSm, adminStyles.gray)}
                       disabled={actionLoading}
-                      onClick={() => onReportAction(reportId, "dismissed", "no_action")}
+                      onClick={() => onReportAction(jobId, "dismissed", "no_action")}
                     >
                       <MinusCircle size={13} /> Bỏ qua báo cáo
                     </button>

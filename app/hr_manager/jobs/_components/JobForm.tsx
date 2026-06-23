@@ -29,6 +29,7 @@ const jobFormSchema = z
         title: z.string().min(3, "Nhập tiêu đề tối thiểu 3 ký tự"),
         description: z.string().min(20, "Mô tả công việc tối thiểu 20 ký tự"),
         requirements: z.string().min(20, "Yêu cầu ứng viên tối thiểu 20 ký tự"),
+        benefits: z.string().min(10, "Quyền lợi tối thiểu 10 ký tự"),
         location: z.string().min(2, "Nhập địa điểm làm việc"),
         tags: z.array(z.string().min(1)).default([]),
         salary_min: z.coerce.number().min(0, "Lương tối thiểu phải >= 0"),
@@ -77,6 +78,7 @@ export default function JobForm({ mode, initialValues, jobId }: JobFormProps) {
             title: initialValues?.title ?? "",
             description: initialValues?.description ?? "",
             requirements: initialValues?.requirements ?? "",
+            benefits: initialValues?.benefits ?? "",
             location: initialValues?.location ?? "",
             tags: initialValues?.tags ?? [],
             salary_min: initialValues?.salary_min ?? 0,
@@ -159,6 +161,7 @@ export default function JobForm({ mode, initialValues, jobId }: JobFormProps) {
         setValue("title", data.title || "", opts);
         setValue("description", data.description || "", opts);
         setValue("requirements", data.requirements || "", opts);
+        setValue("benefits", data.benefits || "", opts);
         setValue("location", data.location || "", opts);
         setValue("tags", data.tags || [], opts);
         setValue("salary_min", data.salary_min || 0, opts);
@@ -256,6 +259,13 @@ export default function JobForm({ mode, initialValues, jobId }: JobFormProps) {
                                 {...register("requirements")}
                                 error={errors.requirements?.message}
                             />
+                            <TextareaField
+                                label="Quyền lợi"
+                                rows={10}
+                                placeholder="Lương, thưởng, bảo hiểm, chế độ đãi ngộ..."
+                                {...register("benefits")}
+                                error={errors.benefits?.message}
+                            />
                         </div>
 
                         <Controller
@@ -279,19 +289,37 @@ export default function JobForm({ mode, initialValues, jobId }: JobFormProps) {
                         </div>
 
                         <div className={styles.detailsGrid}>
-                            <InputField
-                                label="Lương tối thiểu"
-                                type="number"
-                                min={0}
-                                {...register("salary_min")}
-                                error={errors.salary_min?.message}
+                            <Controller
+                                control={control}
+                                name="salary_min"
+                                render={({ field }) => (
+                                    <InputField
+                                        label="Lương tối thiểu"
+                                        type="text"
+                                        value={field.value ? field.value.toLocaleString("en-US") : ""}
+                                        onChange={(e) => {
+                                            const rawValue = e.target.value.replace(/\D/g, "");
+                                            field.onChange(rawValue ? Number(rawValue) : 0);
+                                        }}
+                                        error={errors.salary_min?.message}
+                                    />
+                                )}
                             />
-                            <InputField
-                                label="Lương tối đa"
-                                type="number"
-                                min={0}
-                                {...register("salary_max")}
-                                error={errors.salary_max?.message}
+                            <Controller
+                                control={control}
+                                name="salary_max"
+                                render={({ field }) => (
+                                    <InputField
+                                        label="Lương tối đa"
+                                        type="text"
+                                        value={field.value ? field.value.toLocaleString("en-US") : ""}
+                                        onChange={(e) => {
+                                            const rawValue = e.target.value.replace(/\D/g, "");
+                                            field.onChange(rawValue ? Number(rawValue) : 0);
+                                        }}
+                                        error={errors.salary_max?.message}
+                                    />
+                                )}
                             />
                             <InputField
                                 label="Số năm kinh nghiệm"

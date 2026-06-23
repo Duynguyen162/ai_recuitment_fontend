@@ -189,9 +189,6 @@ export default function CandidateProfileModal({
                                                 <div style={{ color: "#475569", fontSize: "0.85rem" }}>
                                                     {edu.degree}{edu.major ? ` • ${edu.major}` : ""}
                                                 </div>
-                                                <div style={{ color: "#94a3b8", fontSize: "0.8rem", marginTop: "0.15rem" }}>
-                                                    {edu.start_date} – {edu.end_date || "Hiện tại"}
-                                                </div>
                                             </div>
                                         ))}
                                     </Section>

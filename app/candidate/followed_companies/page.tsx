@@ -44,8 +44,7 @@ export default function FollowedCompaniesPage() {
         setCompanies((prev) => prev.filter((c) => c.id !== companyId));
 
         try {
-            // TODO: Mở comment dòng dưới đây để gọi API hủy theo dõi thực tế
-            // await apiClient.post(`/public/companies/${companyId}/follow`);
+            await apiClient.post(`/public/companies/${companyId}/follow`);
             toast.success("Đã hủy theo dõi công ty.");
         } catch (error) {
             // Revert lại nếu API lỗi
