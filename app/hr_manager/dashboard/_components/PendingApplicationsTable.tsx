@@ -39,7 +39,7 @@ export default function PendingApplicationsTable({
                                     <td className={styles.jobTitle}>{item.candidate_name}</td>
                                     <td>{item.job_title}</td>
                                     <td>{item.time}</td>
-                                    <td style={{ display: "flex", justifyContent: "center" }}>
+                                    <td style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "74.4px" }}>
                                         <Link href={`/hr_manager/candidates?jobId=${item.id}`}>
                                             <Eye size={16} style={{ marginRight: "0.3rem" }} />
                                         </Link>
