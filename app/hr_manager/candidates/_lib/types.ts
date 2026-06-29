@@ -84,4 +84,5 @@ export interface CandidateProfileData {
     issued_date?: string;
   }>;
   skills?: string[];
+  interview?: InterviewSchedule | null;
 }

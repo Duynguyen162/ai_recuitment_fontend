@@ -9,22 +9,16 @@ import React, {
     useRef,
     Suspense,
 } from "react";
-import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
-    ArrowRight,
-    BriefcaseBusiness,
-    CalendarDays,
     Eye,
     Lock,
     Search,
     Sparkles,
-    Users,
 } from "lucide-react";
 import cx from "classnames";
 import toast, { Toaster } from "react-hot-toast";
 
-import Button from "@/components/ui/Button";
 import { useCompanyProfile } from "@/hooks/useCompanyProfile";
 import apiClient from "@/lib/apiClient";
 import { previewFileFromServer } from "@/utils/fileUtils";
@@ -34,9 +28,9 @@ import ApplicantsTable from "./_components/ApplicantsTable";
 import CandidateProfileModal from "./_components/CandidateProfileModal";
 import InterviewNotesModal from "./_components/InterviewNotesModal";
 import InterviewScheduleModal from "./_components/InterviewScheduleModal";
+import JobSidebar from "./_components/JobSidebar";
 import ConfirmModal from "@/components/ui/ConfirmModal";
 import { TAB_ORDER, getTabLabel } from "./_lib/constants";
-import { filterApplicants, formatJobStatus } from "./_lib/helpers";
 import { normalizeApplicant, normalizeJob } from "./_lib/normalizers";
 import {
     Applicant,
@@ -455,16 +449,26 @@ function JobApplicantsContent() {
                 notes: values.notes,
             };
 
+            let createdId: number | undefined = undefined;
+
             if (scheduleApplicant.interview?.id) {
                 await apiClient.put(
                     `/interview/schedules/${scheduleApplicant.interview.id}`,
                     payload
                 );
             } else {
-                await apiClient.post("/interview/schedules", {
+                const response = await apiClient.post("/interview/schedules", {
                     ...payload,
                     application_id: scheduleApplicant.application_id,
                 });
+
+                // Extract created schedule id from API response
+                const resData = response.data;
+                if (resData?.data?.id) {
+                    createdId = resData.data.id;
+                } else if (resData?.id) {
+                    createdId = resData.id;
+                }
             }
 
             updateApplicantState(
@@ -473,6 +477,7 @@ function JobApplicantsContent() {
                     status: "interviewing",
                     interview: {
                         ...scheduleApplicant.interview,
+                        id: scheduleApplicant.interview?.id ?? createdId,
                         interview_time: values.interview_time,
                         meeting_link: values.meeting_link,
                         location: values.location,
@@ -521,21 +526,21 @@ function JobApplicantsContent() {
     return (
         <>
             <div className={styles.pageContainer}>
-                <div className={styles.header}>
-                    <div>
+                {/* <div className={styles.header}>
+                    {/* <div>
                         <h1>Ứng viên theo từng job</h1>
                         <p>
                             Chọn một job ở cột bên trái để xem đúng danh sách ứng viên đã ứng
                             tuyển vào job đó.
                         </p>
-                    </div>
+                    </div> 
                     {!loadingCompany && !isVip && (
                         <Link href="/hr_manager/pricing" className={styles.upgradeCta}>
                             Nâng cấp VIP
                             <ArrowRight size={16} />
                         </Link>
                     )}
-                </div>
+                </div> */}
 
                 <div className={styles.aiGateCard}>
                     <div className={styles.aiGateHeader}>
@@ -564,8 +569,14 @@ function JobApplicantsContent() {
                     </div>
                 </div>
 
-                <div className={styles.workspace} style={{ display: 'block' }}>
-                    <section className={styles.applicantsPanel} style={{ width: '100%' }}>
+                <div className={styles.workspace}>
+                    <JobSidebar
+                        jobs={jobs}
+                        jobsLoading={jobsLoading}
+                        selectedJobId={selectedJobId}
+                        onSelectJob={handleSelectJob}
+                    />
+                    <section className={styles.applicantsPanel}>
                         <div className={styles.filterSection}>
                             <div className={styles.summaryGrid}>
                                 <div className={styles.summaryCard}>
@@ -619,21 +630,6 @@ function JobApplicantsContent() {
                                         }}
                                     />
                                 </div>
-                                <div className={styles.jobFilterWrapper} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                    <label style={{ fontWeight: 400, whiteSpace: 'nowrap', color: 'black' }}>Lọc:</label>
-                                    <select
-                                        value={selectedJobId}
-                                        onChange={(e) => {
-                                            handleSelectJob(e.target.value === "all" ? "all" : Number(e.target.value));
-                                        }}
-                                        style={{ padding: '0.5rem', color: '#000000ff', borderRadius: '6px', border: '1px solid #e2e8f0', minWidth: '200px' }}
-                                    >
-                                        <option value="all">Tất cả Job</option>
-                                        {jobs.map(job => (
-                                            <option key={job.id} value={job.id}>{job.title}</option>
-                                        ))}
-                                    </select>
-                                </div>
                             </div>
                             {isVip && (
                                 <div style={{ padding: '0 1.25rem 0.5rem', display: 'flex', justifyContent: 'flex-end' }}>
@@ -664,6 +660,7 @@ function JobApplicantsContent() {
                                 onOpenAiReview={openAiReview}
                                 onSelectAction={handleStatusAction}
                                 onOpenNotes={setNotesApplicant}
+                                onReschedule={setScheduleApplicant}
                             />
                         </div>
                     </section>
@@ -699,6 +696,10 @@ function JobApplicantsContent() {
                     candidateName={profileApplicant.candidate_name}
                     email={profileApplicant.email}
                     onClose={() => setProfileApplicant(null)}
+                    onReschedule={() => {
+                        setScheduleApplicant(profileApplicant);
+                        setProfileApplicant(null);
+                    }}
                 />
             )}
 
