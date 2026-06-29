@@ -88,16 +88,35 @@ export function normalizeApplicant(item: unknown): Applicant | null {
 
   if (idValue === undefined || idValue === null) return null;
 
-  const interviewTime =
-    typeof source.interview_time === "string" ? source.interview_time : "";
-  const meetingLink =
-    typeof source.meeting_link === "string" ? source.meeting_link : "";
-  const location =
-    typeof source.location === "string" ? source.location : "";
-  const interviewNotes =
-    typeof source.notes === "string" ? source.notes : "";
-  const interviewId =
-    typeof source.interview_id === "number" ? source.interview_id : undefined;
+  // Support nested interview object or flat fields
+  const rawInterview = (source.interview && typeof source.interview === "object") 
+    ? (source.interview as Record<string, any>) 
+    : null;
+
+  const interviewTime = rawInterview
+    ? String(rawInterview.interview_time ?? "")
+    : (typeof source.interview_time === "string" ? source.interview_time : "");
+
+  const meetingLink = rawInterview
+    ? String(rawInterview.meeting_link ?? "")
+    : (typeof source.meeting_link === "string" ? source.meeting_link : "");
+
+  const location = rawInterview
+    ? String(rawInterview.location ?? "")
+    : (typeof source.location === "string" ? source.location : "");
+
+  const interviewNotes = rawInterview
+    ? String(rawInterview.notes ?? "")
+    : (typeof source.notes === "string" ? source.notes : "");
+
+  const interviewId = rawInterview
+    ? (typeof rawInterview.id === "number" ? rawInterview.id : undefined)
+    : (typeof source.interview_id === "number" ? source.interview_id : undefined);
+
+  const rawMode = rawInterview ? String(rawInterview.mode ?? "") : "";
+  const interviewMode = (rawMode === "online" || rawMode === "offline")
+    ? (rawMode as InterviewMode)
+    : undefined;
 
   return {
     id: String(idValue),
@@ -153,7 +172,7 @@ export function normalizeApplicant(item: unknown): Applicant | null {
             meeting_link: meetingLink,
             location: location,
             notes: interviewNotes,
-            mode: meetingLink.trim() ? "online" : (location.trim() ? "offline" : "online"),
+            mode: interviewMode || (meetingLink.trim() ? "online" : (location.trim() ? "offline" : "online")),
           }
         : null,
     notes: typeof source.notes === "string" ? source.notes : null,

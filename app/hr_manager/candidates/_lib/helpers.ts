@@ -65,11 +65,11 @@ export function getInterviewSummary(schedule: InterviewSchedule | null) {
 }
 
 export function shouldShowActionControls(tab: CandidatesTab) {
-  return tab !== "all";
+  return true;
 }
 
 export function canEditInterviewNotes(status: AppStatus, tab: CandidatesTab) {
-  return status === "interviewing" && tab === "interviewing";
+  return status === "interviewing";
 }
 
 export function filterApplicants(

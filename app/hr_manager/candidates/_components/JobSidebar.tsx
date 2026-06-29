@@ -1,44 +1,75 @@
 "use client";
 
 import cx from "classnames";
+import { useState } from "react";
 
-import { formatJobStatus } from "../_lib/helpers";
 import { HrJob } from "../_lib/types";
 import styles from "../candidates.module.scss";
 
 interface JobSidebarProps {
   jobs: HrJob[];
   jobsLoading: boolean;
-  selectedJobId: number | null;
-  onSelectJob: (jobId: number) => void;
-  //   onRefresh: () => void;
+  selectedJobId: number | "all";
+  onSelectJob: (jobId: number | "all") => void;
 }
+
+type JobFilter = "published" | "paused" | "closed";
 
 export default function JobSidebar({
   jobs,
   jobsLoading,
   selectedJobId,
   onSelectJob,
-  //   onRefresh,
 }: JobSidebarProps) {
+  const [activeFilter, setActiveFilter] = useState<JobFilter>("published");
+
+  const filteredJobs = jobs.filter((j) => {
+    const s = j.status?.toLowerCase() || "";
+    if (activeFilter === "published") return s === "published";
+    if (activeFilter === "paused") return s === "paused";
+    if (activeFilter === "closed") return s === "closed";
+    return false;
+  });
+
   return (
     <aside className={styles.jobPanel}>
       <div className={styles.panelHeader}>
         <div>
           <span className={styles.panelEyebrow}>Danh sách job</span>
-          <h2>Chọn job cần xem ứng viên</h2>
+          <h2>Chọn job cần xem</h2>
         </div>
+      </div>
+
+      <div className={styles.sidebarTabs}>
+        <button
+          className={cx(styles.sidebarTabBtn, { [styles.active]: activeFilter === "published" })}
+          onClick={() => setActiveFilter("published")}
+        >
+          Đang HĐ
+        </button>
+        <button
+          className={cx(styles.sidebarTabBtn, { [styles.active]: activeFilter === "paused" })}
+          onClick={() => setActiveFilter("paused")}
+        >
+          Tạm dừng
+        </button>
+        <button
+          className={cx(styles.sidebarTabBtn, { [styles.active]: activeFilter === "closed" })}
+          onClick={() => setActiveFilter("closed")}
+        >
+          Đã đóng
+        </button>
       </div>
 
       <div className={styles.jobList}>
         {jobsLoading ? (
           <div className={styles.infoCard}>Đang tải danh sách job...</div>
-        ) : jobs.length === 0 ? (
+        ) : filteredJobs.length === 0 ? (
           <div className={styles.infoCard}>
-            Chưa có job nào để xem ứng viên.
+            Không có job nào.
           </div>
         ) : (
-          jobs.map((job) => (
+          filteredJobs.map((job) => (
             <button
               key={job.id}
               type="button"
@@ -48,12 +79,9 @@ export default function JobSidebar({
               onClick={() => onSelectJob(job.id)}
             >
               <div className={styles.jobCardTop}>
-                <span className={styles.jobStatus}>
-                  {formatJobStatus(job.status)}
-                </span>
+                <strong className={styles.jobTitleText} title={job.title}>{job.title}</strong>
               </div>
-              <strong>{job.title}</strong>
-              <p>{job.location}</p>
+              <p className={styles.jobLocationText}>{job.location}</p>
             </button>
           ))
         )}

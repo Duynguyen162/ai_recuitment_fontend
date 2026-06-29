@@ -37,16 +37,16 @@ export function getTabLabel(tab: CandidatesTab) {
   }
 }
 
-export function getAvailableActions(tab: CandidatesTab): AppStatus[] {
-  if (tab === "applied") {
+export function getAvailableActions(status: AppStatus): AppStatus[] {
+  if (status === "applied") {
     return ["interviewing", "rejected"];
   }
 
-  if (tab === "interviewing") {
+  if (status === "interviewing") {
     return ["hired", "rejected"];
   }
 
-  if (tab === "hired") {
+  if (status === "hired") {
     return ["left_company"];
   }
 
